@@ -1,0 +1,70 @@
+{
+  "name": "pl-react",
+  "version": "0.0.1",
+  "description": "Pl React",
+  "main": "lib/index.cjs",
+  "module": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "require": "./lib/index.cjs"
+    },
+    "./lib/utils": {
+      "import": "./lib/utils/index.js",
+      "require": "./lib/utils/index.cjs"
+    },
+    "./lib/reactivity": {
+      "import": "./lib/reactivity/index.js",
+      "require": "./lib/reactivity/index.cjs"
+    },
+    "./lib/vdom": {
+      "import": "./lib/vdom/index.js",
+      "require": "./lib/vdom/index.cjs"
+    },
+    "./lib/router": {
+      "import": "./lib/router/index.js",
+      "require": "./lib/router/index.cjs"
+    },
+    "./lib/store": {
+      "import": "./lib/store/index.js",
+      "require": "./lib/store/index.cjs"
+    }
+  },
+  "scripts": {
+    "dev": "vite -c build/vite.client.ts",
+    "preview": "vite preview -c build/vite.client.ts",
+    "build:client": "vite build -c build/vite.client.ts",
+    "build:server": "vite build -c build/vite.server.ts",
+    "build": "rm -rf dist/ && npm run build:client && npm run build:server",
+    "start": "node dist/server.js",
+    "tsc:lib": "tsc --project build/tsconfig.lib.json --declaration --emitDeclarationOnly",
+    "build:lib": "rm -rf lib && ts-node --project build/tsconfig.lib.json build/rollup.lib.ts && npm run tsc:lib",
+    "build:online": "rm -rf dist && ts-node --project build/tsconfig.lib.json build/rollup.online.ts"
+  },
+  "keywords": [
+    "plvue",
+    "reactivity",
+    "jsx"
+  ],
+  "author": "yubo9807",
+  "homepage": "http://plvue.hpyyb.cn",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yubo9807/pl-vue.git"
+  },
+  "files": [
+    "lib"
+  ],
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.22.9",
+    "@types/node": "^20.4.2",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "sass": "^1.58.3",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6",
+    "vite": "^4.4.9"
+  }
+}

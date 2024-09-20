@@ -1,0 +1,36 @@
+import { isEquals } from "../utils";
+import { RefItem } from "./ref";
+import { BasicHook, useInstanceTips } from "./utils";
+
+type ExposeItem = {
+  expose: any
+  deps: any[]
+}
+export class Expose extends BasicHook<ExposeItem> {
+
+  /**
+   * 将一些暴露出去，绑定在 ref 上
+   * @param ref 
+   * @param handle 可以在当中处理一些逻辑
+   * @param deps   若 handle 中逻辑较为耗性能时，可加入依赖项来优化性能
+   */
+  use<T>(ref: RefItem<T>, handle: () => T, deps?: any[]) {
+    const { instance, dataMap, count } = this;
+    useInstanceTips(instance);
+
+    const map = dataMap.get(instance) || new Map<number, ExposeItem>();
+    const item = map.get(count);
+
+    // 不存在 || 依赖项发生变化
+    if (!item || item.deps === void 0 || !isEquals(item.deps, deps)) {
+      const expose = handle();
+      ref.current = expose;
+      map.set(count, { expose, deps });
+      dataMap.set(instance, map);
+    } else {
+      ref.current = item.expose;
+    }
+
+    this.count++;
+  }
+}

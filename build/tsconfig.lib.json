@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "target": "ESNext",
+    "module": "NodeNext",
+    "forceConsistentCasingInFileNames": true,
+    "declaration": false,
+    "outDir": "../lib",
+    "moduleResolution": "NodeNext",
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment",
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["test/*"],
+      "~/*": ["./*"],
+    },
+  },
+  "include": ["../core"],
+}
