@@ -185,6 +185,17 @@ export class JsxToNodes {
   }
 
   /**
+   * 销毁组件
+   * @param tree 
+   */
+  destroyComp(tree: CompTree) {
+    const backup = this.treeMap.get(tree);
+    this.option.unmount?.(tree, backup.nodes);
+    nodes_remove(backup.nodes);
+    this.treeMap.delete(tree);
+  }
+
+  /**
    * 更新组件树
    * @param comp 
    * @param tree 
@@ -274,9 +285,7 @@ export class JsxToNodes {
             } else if (type === DiffType.remove) {
               if (isTree(oldValue) && isCompTree(oldValue)) {
                 // 卸载子组件
-                self.option.unmount?.(oldValue, childNode);
-                const { nodes } = self.treeMap.get(oldValue);
-                nodes_remove(nodes);
+                self.destroyComp(oldValue);
               } else {
                 // 删除子节点
                 removeNodes.push(childNode);

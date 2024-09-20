@@ -94,7 +94,9 @@ export function createApp() {
     },
   });
 
-  function render(tree: Tree, parent: Node) {
+  let rootTree: CompTree
+  function render(tree: CompTree, parent: Node) {
+    rootTree = tree;
     const nodes = structure.render(tree);
     customForEach(nodes, node => {
       parent.appendChild(node);
@@ -105,11 +107,16 @@ export function createApp() {
     return structure.updateComp(tree);
   }
 
+  function unmount() {
+    structure.destroyComp(rootTree);
+  }
+
   const instance = {
     ...hooks,
     useComponent,
     render,
     refresh,
+    unmount,
   }
 
   currentApp = () => instance;
