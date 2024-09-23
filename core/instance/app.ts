@@ -137,35 +137,35 @@ export function createApp() {
 }
 
 // 使用缓存中的 app，防止多次 createApp 后而导致实例混乱
-export const app = (): ReturnType<typeof createApp> => cache(currentApp);
+export const getCurrnetInstance = (): ReturnType<typeof createApp> => cache(currentApp);
 
 export const useState: State['use'] = (initialValue) => {
-  return app().state.use(initialValue);
+  return getCurrnetInstance().state.use(initialValue);
 }
 export const useMemo: Memo['use'] = (memo, deps) => {
-  return app().memo.use(memo, deps);
+  return getCurrnetInstance().memo.use(memo, deps);
 }
 export const useEffect: Effect['use'] = (effect, deps) => {
-  return app().effect.use(effect, deps);
+  return getCurrnetInstance().effect.use(effect, deps);
 }
 export const useLayoutEffect: Effect['use'] = (effect, deps) => {
-  return app().layoutEffect.use(effect, deps);
+  return getCurrnetInstance().layoutEffect.use(effect, deps);
 }
 export const useCallback: Callback['use'] = (callback, deps) => {
-  return app().callback.use(callback, deps);
+  return getCurrnetInstance().callback.use(callback, deps);
 }
 export const useRef: Ref['use'] = (value) => {
-  return app().ref.use(value);
+  return getCurrnetInstance().ref.use(value);
 }
 export const useContext: Context['use'] = (context) => {
-  return app().context.use(context);
+  return getCurrnetInstance().context.use(context);
 }
 export const useImperativeHandle: Expose['use'] = (ref, handle, deps) => {
-  return app().expose.use(ref, handle, deps);
+  return getCurrnetInstance().expose.use(ref, handle, deps);
 }
 export const useReducer: Reducer['use'] = (reducer, initialState, init) => {
-  return app().reducer.use(reducer, initialState, init);
+  return getCurrnetInstance().reducer.use(reducer, initialState, init);
 }
 export const useStore: Store['use'] = (result) => {
-  return app().store.use(result);
+  return getCurrnetInstance().store.use(result);
 }

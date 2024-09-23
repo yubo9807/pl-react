@@ -1,7 +1,7 @@
 import { customForEach } from "../utils"
 import { CompTree, Fragment, h, Tree, TreeValue } from "../vdom"
 import { isCompTree, isTree } from "../vdom/utils";
-import { getCurrnetInstance, useLayoutEffect, useMemo } from "./app";
+import { getCurrnetInstance, useLayoutEffect, useMemo } from "../instance/app";
 
 type Key = string | Function
 type BackupData = { tree: TreeValue, nodes: HTMLElement[] }

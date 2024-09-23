@@ -1,4 +1,6 @@
-import { Fragment, h, KeepAlive, useState } from "~/core"
+import { h, useState } from "~/core"
+import { KeepAlive } from "~/core/components";
+
 
 function App() {
   const [count, setCount] = useState(0);
