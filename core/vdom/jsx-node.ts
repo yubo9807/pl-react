@@ -195,10 +195,25 @@ export class JsxToNodes {
    * 销毁组件
    * @param tree 
    */
-  destroyComp(tree: CompTree) {
+  destroyComp(tree: CompTree, isRemove = true) {
+    const alive = getKeepAliveBackup(tree);
     const backup = this.treeMap.get(tree);
+    if (alive) {  // 如果设置了 keepAlive，将不会触发钩子，数据也将保留
+      isRemove && nodes_remove(backup.nodes);
+      return;
+    }
+
+    // 卸载子组件
+    if (isTree(backup.tree)) {
+      customForEach(backup.tree.children, childTree => {
+        if (isTree(childTree) && isCompTree(childTree)) {
+          this.destroyComp(childTree);
+        }
+      })
+    }
+
     this.option.unmount?.(tree, backup.nodes);
-    nodes_remove(backup.nodes);
+    isRemove && nodes_remove(backup.nodes);
     this.treeMap.delete(tree);
   }
 
@@ -221,11 +236,7 @@ export class JsxToNodes {
         // 节点发生变化，直接替换
         if (newTree.tag !== oldTree.tag) {
           if (isCompTree(oldTree)) {
-            const alive = getKeepAliveBackup(oldTree);
-            if (!alive) {  // 如果设置了 keepAlive，将不会触发钩子，数据也将保留
-              self.option.unmount?.(oldTree, nodes);
-              self.treeMap.delete(oldTree);
-            }
+            self.destroyComp(oldTree, false);
           }
           const newNodes = self.render(newTree);
           nodes_replaceWith(newNodes, nodes);
@@ -305,8 +316,7 @@ export class JsxToNodes {
               const newNodes = self.render(newValue);
               nodes_after(newNodes, node);
             } else {
-              // 更新子节点（有可能旧的节点已经被 Fragment 处理掉了）
-              childNode && updateTree(newValue, oldValue, [childNode]);
+              updateTree(newValue, oldValue, [childNode]);
             }
           })
 
