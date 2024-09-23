@@ -8,7 +8,8 @@ export type Children = Array<Tree | string | number>
 
 export interface PropsType {
   // ref?:      { current: unknown }
-  children?: Children
+  children?:   Children
+  [k: string]: any
 }
 
 

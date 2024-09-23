@@ -6,7 +6,7 @@ import reducer from './example/reducer';
 import keepAlive from './example/keep-alive';
 import store from './example/store';
 
-export default store
+export default keepAlive
 
 import * as r from '~/core'
 console.log(r)

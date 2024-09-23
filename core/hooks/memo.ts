@@ -1,7 +1,6 @@
 import { isEquals } from "../utils";
 import { BasicHook, useInstanceTips } from "./utils";
 
-type MemoFunc = Function
 type MemoDeps = any[]
 type MemoItem = {
   result: any
@@ -14,7 +13,7 @@ export class Memo extends BasicHook<MemoItem> {
    * @param func 
    * @param deps 
    */
-  use<T extends MemoFunc>(func: T, deps?: MemoDeps) {
+  use<T>(func: () => T, deps?: MemoDeps): T {
 
     const { instance, dataMap, count } = this;
     useInstanceTips(instance);
@@ -23,6 +22,7 @@ export class Memo extends BasicHook<MemoItem> {
     const item = map.get(count);
 
     if (item && deps !== void 0 && isEquals(deps, item.deps)) {
+      this.count ++;
       return item.result;
     }
 

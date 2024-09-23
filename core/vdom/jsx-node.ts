@@ -1,3 +1,4 @@
+import { getKeepAliveBackup } from "../instance/keep-alive";
 import { customForEach, isClass, isObject, isString, isEmpty, isEquals } from "../utils";
 import { nodes_after, nodes_remove, nodes_replaceWith, WithNode } from "./dom";
 import { isFragment } from "./h";
@@ -175,6 +176,12 @@ export class JsxToNodes {
    * @returns 
    */
   createComp(tree: CompTree) {
+    const alive = getKeepAliveBackup(tree);
+    if (alive) {
+      this.treeMap.set(tree, alive);
+      return alive.nodes;
+    }
+
     const newTree = this.compTreeExec(tree);
     const nodes = this.render(newTree);
 
@@ -214,8 +221,11 @@ export class JsxToNodes {
         // 节点发生变化，直接替换
         if (newTree.tag !== oldTree.tag) {
           if (isCompTree(oldTree)) {
-            self.option.unmount?.(oldTree, nodes);
-            self.treeMap.delete(oldTree);
+            const alive = getKeepAliveBackup(oldTree);
+            if (!alive) {  // 如果设置了 keepAlive，将不会触发钩子，数据也将保留
+              self.option.unmount?.(oldTree, nodes);
+              self.treeMap.delete(oldTree);
+            }
           }
           const newNodes = self.render(newTree);
           nodes_replaceWith(newNodes, nodes);

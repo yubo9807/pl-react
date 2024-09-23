@@ -107,8 +107,20 @@ export function createApp() {
     return structure.updateComp(tree);
   }
 
+  /**
+   * 卸载应用
+   */
   function unmount() {
     structure.destroyComp(rootTree);
+  }
+
+  /**
+   * 获取组件树结果
+   * @param tree 
+   * @returns 
+   */
+  function getCompResult(tree: CompTree) {
+    return structure.treeMap.get(tree);
   }
 
   const instance = {
@@ -117,6 +129,7 @@ export function createApp() {
     render,
     refresh,
     unmount,
+    getCompResult,
   }
 
   currentApp = () => instance;
@@ -124,7 +137,7 @@ export function createApp() {
 }
 
 // 使用缓存中的 app，防止多次 createApp 后而导致实例混乱
-export const app = () => cache(currentApp);
+export const app = (): ReturnType<typeof createApp> => cache(currentApp);
 
 export const useState: State['use'] = (initialValue) => {
   return app().state.use(initialValue);
