@@ -2,7 +2,9 @@
 import { h } from '~/core';
 import App from './app';
 import { createApp } from '~/core/instance/app';
+import { MyComp } from './components/my-comp';
 
 const app = createApp();
-
-app.render(<App />, document.getElementById('root'));
+app.useComponent('my-comp', MyComp);
+const root = document.getElementById('root');
+app.render(<App />, root);
