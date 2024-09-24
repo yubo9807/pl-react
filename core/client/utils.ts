@@ -1,6 +1,6 @@
+import { isFragment } from '../common';
+import { CompTree, Tree } from "../common/type";
 import { isEquals, isFunction, isObject } from "../utils";
-import { isFragment } from "./h";
-import { CompTree, Tree } from "./type";
 
 export function isTree(tree: any): tree is Tree {
   return isObject(tree) && isObject(tree.attrs);
@@ -69,13 +69,4 @@ export function diffObject(obj1: object, obj2: object): DiffObjectReturn {
   }
 
   return collect;
-}
-
-/**
- * 是否为节点片段
- * @param node 
- * @returns 
- */
-export function isFragmentNode(node: Node) {
-  return node instanceof DocumentFragment;
 }

@@ -1,8 +1,8 @@
 import { Callback, Context, Effect, Memo, Ref, State, Expose, Reducer, Store } from "../hooks";
 import { AnyObj, cache, customForEach, isString } from "../utils";
-import { JsxToNodes } from "../vdom";
-import { Component, CompTree, Tree } from "../vdom/type";
-import { isTree } from "../vdom/utils";
+import { JsxToNodes } from "../client/jsx-node";
+import { isTree } from "../common";
+import type { Component, CompTree } from "../common/type";
 // import { clearCompTree, collectChildTree } from "./tree";
 
 let currentApp: () => ReturnType<typeof createApp>;
@@ -95,41 +95,43 @@ export function createApp() {
   });
 
   let rootTree: CompTree
-  function render(tree: CompTree, parent: Node) {
-    rootTree = tree;
-    const nodes = structure.render(tree);
-    customForEach(nodes, node => {
-      parent.appendChild(node);
-    })
-  }
-
-  function refresh(tree: CompTree) {
-    return structure.updateComp(tree);
-  }
-
-  /**
-   * 卸载应用
-   */
-  function unmount() {
-    structure.destroyComp(rootTree);
-  }
-
-  /**
-   * 获取组件树结果
-   * @param tree 
-   * @returns 
-   */
-  function getCompResult(tree: CompTree) {
-    return structure.treeMap.get(tree);
-  }
-
   const instance = {
     ...hooks,
     useComponent,
-    render,
-    refresh,
-    unmount,
-    getCompResult,
+    /**
+     * 渲染组件，并挂载到父节点上
+     * @param tree 
+     * @param parent 
+     */
+    render(tree: CompTree, parent: Node) {
+      rootTree = tree;
+      const nodes = structure.render(tree);
+      customForEach(nodes, node => {
+        parent.appendChild(node);
+      })
+    },
+    /**
+     * 强制更新组件
+     * @param tree 
+     * @returns 
+     */
+    refresh(tree: CompTree) {
+      return structure.updateComp(tree);
+    },
+    /**
+     * 卸载应用
+     */
+    unmount() {
+      structure.destroyComp(rootTree);
+    },
+    /**
+     * 获取组件树结果
+     * @param tree 
+     * @returns 
+     */
+    getCompResult(tree: CompTree) {
+      return structure.treeMap.get(tree);
+    },
   }
 
   currentApp = () => instance;

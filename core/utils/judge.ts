@@ -101,3 +101,11 @@ export function isEquals(val1: any, val2: any) {
 export function isEmpty(value: any) {
   return [null, void 0, false].includes(value);
 }
+
+/**
+ * 是否为客户端
+ * @returns 
+ */
+export function isClient() {
+  return typeof window === 'object';
+}

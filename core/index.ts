@@ -1,4 +1,4 @@
-export { h, Fragment } from './vdom';
+export { h, Fragment } from './common/h';
+export * from './common/type';
 export * from './instance/app';
-export * from './vdom/type';
 export { defineStore } from './hooks';
