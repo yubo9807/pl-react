@@ -1,6 +1,6 @@
 import { isFragment } from './h';
 import { CompTree, Tree } from "./type";
-import { isEquals, isFunction, isObject } from "../utils";
+import { customForEach, isEmpty, isEquals, isFunction, isObject } from "../utils";
 
 export function isTree(tree: any): tree is Tree {
   return isObject(tree) && isObject(tree.attrs);
@@ -69,4 +69,20 @@ export function diffObject(obj1: object, obj2: object): DiffObjectReturn {
   }
 
   return collect;
+}
+
+/**
+ * 连接 class
+ * @param args 剩余参数，类名
+ * @returns 
+ */
+export function joinClass(...args: (string | (() => string))[]) {
+  const results = [];
+  customForEach(args, val => {
+    if (isFunction(val)) val = val();
+    if (!isEmpty(val)) {
+      results.push(val);
+    }
+  })
+  return results.join(' ').trim().replace(/\s+/, ' ');
 }

@@ -1,5 +1,4 @@
-import { joinClass } from "../client/utils";
-import { isFragment, isTree } from "../common";
+import { isFragment, isTree, joinClass } from "../common";
 import { BaseComponent, CompTree, NodeTree, TreeValue } from "../common/type";
 import { customForEach, isClass, isObject, isString } from "../utils";
 

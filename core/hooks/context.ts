@@ -1,7 +1,7 @@
-import { createContext } from "../instance/context";
 import { AnyObj } from "../utils";
-import { CompTree } from "../vdom/type";
 import { BasicHook, useInstanceTips } from "./utils";
+import type { createContext } from "../components";
+import type { CompTree } from "../common/type";
 
 export class Context extends BasicHook<AnyObj> {
 

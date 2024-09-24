@@ -1,6 +1,6 @@
-import { customForEach, isClass, isObject, isString, isEmpty, isEquals } from "../utils";
+import { customForEach, isClass, isObject, isString, isEmpty, isEquals, isArray } from "../utils";
 import { nodes_after, nodes_remove, nodes_replaceWith, WithNode } from "./dom";
-import { isFragment, isCompTree, isTree, diffObject, DiffType } from "../common";
+import { isFragment, isCompTree, isTree, diffObject, DiffType, joinClass } from "../common";
 import { getKeepAliveBackup } from "../components/keep-alive";
 import type { BaseComponent, TreeValue, CompTree, NodeTree } from "../common/type";
 
@@ -102,7 +102,18 @@ export class JsxToNodes {
     const el = document.createElement(tag);
 
     for (const key in attrs) {
-      el[key] = attrs[key];
+      let value = attrs[key];
+      if (key === 'style' && isObject(value)) {
+        for (const s in value) {
+          el[key][s] = value[s];
+        }
+        continue;
+      }
+
+      if (key === 'className' && isArray(value)) {
+        value = joinClass(...value);
+      }
+      el[key] = value;
     }
 
     customForEach(children, val => {

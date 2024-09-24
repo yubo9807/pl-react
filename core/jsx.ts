@@ -1,9 +1,18 @@
 import { RefItem } from "./hooks"
 import { AnyObj, ExcludeKey } from "./utils"
 
+type StyleObject = {
+  [I in keyof CSSStyleDeclaration]?: CSSStyleDeclaration[I]
+} & {
+  [k: `--${string}`]: string | number
+}
 type HTMLAttributes<T extends AnyObj> = {
   [K in keyof ExcludeKey<T, 'className' | 'style'>]?: T[K]
-} & { ref?: RefItem<unknown> }
+} & {
+  className?: string | string[]
+  style?:     StyleObject
+  ref?:       RefItem<unknown>
+}
 
 export interface IntrinsicElements {
   a: HTMLAttributes<HTMLAnchorElement>
