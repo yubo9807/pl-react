@@ -5,6 +5,36 @@
   "main": "lib/index.cjs",
   "module": "lib/index.js",
   "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./lib/client/index.js",
+      "require": "./lib/client/index.cjs"
+    },
+    "./utils": {
+      "import": "./lib/utils/index.js",
+      "require": "./lib/utils/index.cjs"
+    },
+    "./common": {
+      "import": "./lib/common/index.js",
+      "require": "./lib/common/index.cjs"
+    },
+    "./client": {
+      "import": "./lib/client/index.js",
+      "require": "./lib/client/index.cjs"
+    },
+    "./server": {
+      "import": "./lib/server/index.js",
+      "require": "./lib/server/index.cjs"
+    },
+    "./components": {
+      "import": "./lib/components/index.js",
+      "require": "./lib/components/index.cjs"
+    },
+    "./router": {
+      "import": "./lib/router/index.js",
+      "require": "./lib/router/index.cjs"
+    }
+  },
   "scripts": {
     "dev": "vite -c build/vite.client.ts",
     "preview": "vite preview -c build/vite.client.ts",

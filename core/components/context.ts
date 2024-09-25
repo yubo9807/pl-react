@@ -1,5 +1,5 @@
 import { AnyObj, customForEach, throwError } from "../utils";
-import { h, Fragment, getCurrnetInstance, useEffect, useLayoutEffect } from "..";
+import { h, Fragment, getCurrnetInstance, useEffect, useLayoutEffect } from "../client";
 import type { CompTree } from "../common/type";
 
 /**

@@ -1,4 +1,4 @@
-import { h, Fragment, useState, useMemo, CompTree, useEffect, StyleObject } from "..";
+import { h, Fragment, useState, useMemo, CompTree, useEffect, StyleObject } from "../client";
 import { RefItem } from "../hooks";
 import { isObject } from "../utils";
 import { collect, createRouter, queryRoute, useRouter } from "./create-router";

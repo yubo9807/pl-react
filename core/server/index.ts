@@ -1,6 +1,7 @@
 import { isFragment, isTree, joinClass } from "../common";
 import { BaseComponent, CompTree, NodeTree, TreeValue } from "../common/type";
 import { customForEach, isClass, isObject, isString } from "../utils";
+export { h, Fragment } from "../common";
 
 /**
  * 将组件树转为字符串

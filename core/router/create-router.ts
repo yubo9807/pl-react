@@ -55,7 +55,7 @@ class Router {
 
     this.beforeEach(to, from, () => {
       callback(href);
-      this.currentRoute = to;
+      this.currentRoute = to as RouteConfig;
       const query = queryRoute(children, href);
       query && controls(query);
     });
