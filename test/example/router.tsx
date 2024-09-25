@@ -25,6 +25,8 @@ function App() {
       <a onclick={() => router.push('/home')}>home</a>
       &nbsp;
       <a onclick={() => router.push('/about')}>about</a>
+      &nbsp;
+      <a onclick={() => router.push('/123')}>404</a>
     </nav>
     {child}
   </div>

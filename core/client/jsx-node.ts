@@ -118,9 +118,7 @@ export class JsxToNodes {
 
     customForEach(children, val => {
       const nodes = this.render(val);
-      customForEach(nodes, node => {
-        el.appendChild(node);
-      })
+      el.append(...nodes);
     });
 
     nodeMount?.(tree, el);
@@ -247,7 +245,6 @@ export class JsxToNodes {
         // 节点发生变化，直接替换
         if (newTree.tag !== oldTree.tag) {
           if (isCompTree(oldTree)) {
-            nodes = self.treeMap.get(oldTree).nodes;
             self.destroyComp(oldTree, false);
           }
           const newNodes = self.render(newTree);
@@ -326,9 +323,14 @@ export class JsxToNodes {
             } else if (type === DiffType.create) {
               // 添加子节点
               const newNodes = self.render(newValue);
-              nodes_after(newNodes, node);
+              node.append(...newNodes);
             } else {
-              updateTree(newValue, oldValue, [childNode]);
+              // 组件
+              if (isTree(oldValue) && isCompTree(oldValue)) {
+                updateTree(newValue, oldValue, self.treeMap.get(oldValue).nodes);
+              } else {
+                updateTree(newValue, oldValue, [childNode]);
+              }
             }
           })
 
