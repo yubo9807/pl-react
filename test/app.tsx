@@ -5,8 +5,9 @@ import context from './example/context';
 import reducer from './example/reducer';
 import keepAlive from './example/keep-alive';
 import store from './example/store';
+import router from './example/router';
 
-export default store
+export default router;
 
 import * as r from '~/core'
 import * as c from '~/core/components'

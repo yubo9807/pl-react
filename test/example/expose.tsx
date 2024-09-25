@@ -1,4 +1,5 @@
-import { forwardRef, h, useImperativeHandle, useRef, useState } from "~/core"
+import { h, useImperativeHandle, useRef, useState } from "~/core"
+import { forwardRef } from "~/core/components";
 import { RefItem } from "~/core/hooks"
 
 type CompExpose = {

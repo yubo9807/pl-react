@@ -28,9 +28,7 @@ export function nodes_replaceWith(newNodes: WithNode[], oldNodes: WithNode[]) {
  * @param lastNode 
  */
 export function nodes_after(newNodes: WithNode[], lastNode: WithNode) {
-  customForEach(newNodes, node => {
-    lastNode.after(node);
-  });
+  lastNode.after(...newNodes);
 }
 
 export function nodes_remove(newNodes: WithNode[]) {

@@ -208,22 +208,23 @@ export class JsxToNodes {
   destroyComp(tree: CompTree, isRemove = true) {
     const alive = getKeepAliveBackup(tree);
     const backup = this.treeMap.get(tree);
+    const { tree: oldTree, nodes } = backup;
     if (alive) {  // 如果设置了 keepAlive，将不会触发钩子，数据也将保留
-      isRemove && nodes_remove(backup.nodes);
+      isRemove && nodes_remove(nodes);
       return;
     }
 
     // 卸载子组件
-    if (isTree(backup.tree)) {
-      customForEach(backup.tree.children, childTree => {
+    if (isTree(oldTree)) {
+      customForEach(oldTree.children, childTree => {
         if (isTree(childTree) && isCompTree(childTree)) {
           this.destroyComp(childTree);
         }
       })
     }
 
-    this.option.unmount?.(tree, backup.nodes);
-    isRemove && nodes_remove(backup.nodes);
+    this.option.unmount?.(tree, nodes);
+    isRemove && nodes_remove(nodes);
     this.treeMap.delete(tree);
   }
 
@@ -246,6 +247,7 @@ export class JsxToNodes {
         // 节点发生变化，直接替换
         if (newTree.tag !== oldTree.tag) {
           if (isCompTree(oldTree)) {
+            nodes = self.treeMap.get(oldTree).nodes;
             self.destroyComp(oldTree, false);
           }
           const newNodes = self.render(newTree);

@@ -103,12 +103,11 @@ export function createApp() {
      * @param tree 
      * @param parent 
      */
-    render(tree: CompTree, parent: Node) {
+    render(tree: CompTree, parent?: HTMLElement) {
       rootTree = tree;
       const nodes = structure.render(tree);
-      customForEach(nodes, node => {
-        parent.appendChild(node);
-      })
+      parent && parent.append(...nodes);
+      return nodes;
     },
     /**
      * 强制更新组件
