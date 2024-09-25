@@ -1,20 +1,23 @@
-import { isEquals, isString } from "../utils"
+import { isEquals, isRegExp, isString } from "../utils"
 import { BaseRoute, BeforeEach, Child, Meta, RouteConfig } from "./type"
 import { parseUrl, stringifyUrl } from "./utils"
 
 type RouteItem = {
-  path?:       string
+  path?:       string | RegExp
   element:     Child
   meta?:       Meta
   exact?:      boolean
   [k: string]: any
 }
-function queryRoute(pathname: string, routes: RouteItem[]) {
+export function queryRoute(routes: RouteItem[], pathname: string) {
   for (const route of routes) {
     const { path, exact } = route;
-    if (exact && pathname === path) return route;
-    if ((pathname + '/').startsWith(path + '/')) return route;
-    if (!route.path) return route;
+    if (isRegExp(path) && path.test(pathname)) return route;
+    if (isString(path) && pathname === path) {
+      if (exact === false && (pathname + '/').startsWith(path + '/')) return route;
+      if (pathname === path) return route;
+    }
+    if (!path) return route;
   }
 }
 
@@ -54,7 +57,7 @@ class Router {
     this.beforeEach(to, from, () => {
       callback(href);
       this.currentRoute = to;
-      const query = queryRoute(href, children);
+      const query = queryRoute(children, href);
       query && controls(query);
     });
   }

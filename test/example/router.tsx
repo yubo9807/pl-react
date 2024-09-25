@@ -7,8 +7,8 @@ function App() {
   const router = useMemo(() => {
     return createRouter({
       routes: [
-        { path: '/home', element: <Home /> },
-        { path: '/about', element: <About /> },
+        { path: /^\/home(\/?|)$/, element: <Home /> },
+        { path: /^\/about(\/?|\/.+)$/, element: <About /> },
         { element: <h1>404</h1> }
       ],
       controls(route) {

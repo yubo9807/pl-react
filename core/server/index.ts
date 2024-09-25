@@ -14,7 +14,7 @@ export function renderToString(tree: TreeValue) {
 
   const { tag } = tree;
   if (isString(tag)) {
-    return [toReals(tree as NodeTree)];
+    return toReal(tree as NodeTree);
   }
 
   if (isFragment(tag)) {
@@ -24,7 +24,7 @@ export function renderToString(tree: TreeValue) {
   return createComp(tree as CompTree);
 }
 
-function toReals(tree: NodeTree) {
+function toReal(tree: NodeTree) {
   const { tag, attrs, children } = tree;
   let attrStr = '';
 

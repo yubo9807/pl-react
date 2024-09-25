@@ -64,6 +64,15 @@ export function isClass(func: Function): func is WideClass {
 }
 
 /**
+ * 是否为正则
+ * @param value 
+ * @returns 
+ */
+export function isRegExp(value: any): value is RegExp {
+  return value instanceof RegExp;
+}
+
+/**
  * 判断两个值是否相等
  * @param val1 
  * @param val2 
