@@ -1,11 +1,7 @@
+import { StyleObject } from "./common/type"
 import { RefItem } from "./hooks"
 import { AnyObj, ExcludeKey } from "./utils"
 
-type StyleObject = {
-  [I in keyof CSSStyleDeclaration]?: CSSStyleDeclaration[I]
-} & {
-  [k: `--${string}`]: string | number
-}
 type HTMLAttributes<T extends AnyObj> = {
   [K in keyof ExcludeKey<T, 'className' | 'style'>]?: T[K]
 } & {

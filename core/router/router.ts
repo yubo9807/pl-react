@@ -1,86 +1,86 @@
-import { isEquals, isRegExp, isString } from "../utils"
-import { BaseRoute, BeforeEach, Child, Meta, RouteConfig } from "./type"
-import { parseUrl, stringifyUrl } from "./utils"
+import { h, Fragment, useState, useMemo, CompTree, useEffect, StyleObject } from "..";
+import { RefItem } from "../hooks";
+import { isObject } from "../utils";
+import { collect, createRouter, queryRoute, useRouter } from "./create-router";
+import { RouteConfig, RouteItem } from "./type";
+import { stringifyUrl } from "./utils";
 
-type RouteItem = {
-  path?:       string | RegExp
-  element:     Child
-  meta?:       Meta
-  exact?:      boolean
-  [k: string]: any
+type Props = {
+  base?:     string
+  children?: CompTree[]
 }
-export function queryRoute(routes: RouteItem[], pathname: string) {
-  for (const route of routes) {
-    const { path, exact } = route;
-    if (isRegExp(path) && path.test(pathname)) return route;
-    if (isString(path) && pathname === path) {
-      if (exact === false && (pathname + '/').startsWith(path + '/')) return route;
-      if (pathname === path) return route;
-    }
-    if (!path) return route;
-  }
-}
+export function Router(props: Props) {
+  const { base, children } = props;
 
-type Option = {
-  routes:      RouteItem[]
-  controls:    (route: RouteItem) => void
-  base?:       string
-  mode?:       'hash' | 'history'
-  beforeEach?: BeforeEach
-}
+  const routes = useMemo(() => children.map(item => {
+    const route = item.attrs as RouteItem
+    if (route.path) route.path = (base || '') + route.path;
+    return route;
+  }), []);
+  const fristUrl = useMemo(() => location.href.replace(location.origin, ''), [])
+  const [child, setChild] = useState(() => {
+    const query = queryRoute(routes, fristUrl);
+    return query && query.element;
+  });
 
-class Router {
-  option: Option
-  constructor(option: Option) {
-    const { beforeEach, ...rest } = option;
-    beforeEach && (this.beforeEach = beforeEach);
-    this.option = rest;
-    const href = location.href.replace(location.origin, '');
-    this._jump(href, () => {});
-  }
-
-  beforeEach = (from: RouteConfig, to: RouteConfig, next: Function) => next();
-
-  currentRoute: RouteConfig
-  _jump(to: BaseRoute | string, callback: (url: string) => void) {
-    if (isString(to)) {
-      to = parseUrl(to);
-    }
-
-    const { base, routes: children, controls } = this.option;
-    if (!to.path.startsWith(base || '')) return;
-
-    const href = stringifyUrl(to);
-    const from = Object.assign({}, this.currentRoute);
-    if (isEquals(to, from)) return;
-
-    this.beforeEach(to, from, () => {
-      callback(href);
-      this.currentRoute = to;
-      const query = queryRoute(children, href);
-      query && controls(query);
+  const router = useMemo(() => {
+    return createRouter({
+      base: props.base,
+      routes,
+      controls(route) {
+        setChild(route.element);
+      },
     });
-  }
+  }, [])
 
-  push = (option: RouteConfig | string) => {
-    this._jump(option, (href) => {
-      history.pushState(isString(option) ? {} : option.meta, null, href);
-    })
-  }
+  useEffect(() => {
+    return () => {
+      collect.delete(router);
+    }
+  }, [])
 
-  replace = (option: RouteConfig | string) => {
-    this._jump(option, (href) => {
-      history.replaceState(isString(option) ? {} : option.meta, null, href);
-    })
-  }
-
+  // @ts-ignore
+  return h(Fragment, {}, child);
 }
 
-/**
- * 创建路由
- * @param option 
- * @returns 
- */
-export function createRouter(option: Option) {
-  return new Router(option);
+export function Route(props: RouteItem) {}
+
+type LinkProps = {
+  to:         RouteConfig | string
+  type?:      'push' | 'replace'
+  className?: string | string[]
+  style?:     StyleObject
+  ref?:       RefItem<HTMLAnchorElement>
+  children?:  any[]
+  onClick?:   (to: string, next: (to?: RouteConfig | string) => void) => void
+} & {
+  [K in keyof HTMLAnchorElement]?: HTMLAnchorElement[K]
+}
+export function Link(props: LinkProps) {
+  const { to, type, children, onClick, ...args } = props;
+  if (isObject(to)) {
+    props.to = stringifyUrl(to);
+  }
+
+  const router = useRouter();
+
+  function onclick(e) {
+    e.preventDefault();
+
+    function next(to = props.to) {
+      router[type === 'replace' ? 'replace' : 'push'](to)
+    }
+
+    if (onClick) {
+      onClick(to as string, next);
+    } else {
+      next();
+    }
+  }
+
+  return h('a', {
+    ...args,
+    href: props.to,
+    onclick,
+  }, ...children);
 }

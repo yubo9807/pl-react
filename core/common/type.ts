@@ -29,3 +29,9 @@ export interface CompTree extends Tree {
 }
 
 export type TreeValue = Tree | string | number
+
+export type StyleObject = {
+  [I in keyof CSSStyleDeclaration]?: CSSStyleDeclaration[I]
+} & {
+  [k: `--${string}`]: string | number
+}

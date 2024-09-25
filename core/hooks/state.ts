@@ -33,6 +33,7 @@ export class State extends BasicHook<any> {
     value = map.get(count);
 
     const setValue: SetValue<T> = (newValue) => {
+      const value = map.get(count);
       newValue = isFunction(newValue) ? newValue(value) : newValue;
       if (isEquals(newValue, value)) return;
       map.set(count, newValue);

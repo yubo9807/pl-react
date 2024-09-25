@@ -14,3 +14,11 @@ export interface RouteConfig extends BaseRoute {
 }
 
 export type BeforeEach = (to: RouteConfig, from: RouteConfig, next: Function) => void
+
+export type RouteItem = {
+  path?:       string | RegExp
+  element:     Child
+  meta?:       Meta
+  exact?:      boolean
+  [k: string]: any
+}

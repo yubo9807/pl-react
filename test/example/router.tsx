@@ -1,5 +1,5 @@
 import { h, useMemo, useState } from "~/core"
-import { createRouter } from "~/core/router";
+import { createRouter, Router, Route, useRouter, Link } from "~/core/router";
 
 function App() {
   const [child, setChild] = useState();
@@ -29,11 +29,39 @@ function App() {
   </div>
 }
 
-function Home() {
-  return <div>Home</div>
-}
-function About() {
-  return <div>About</div>
+function App2() {
+  const router = useRouter();
+
+  return <div>
+    <nav>
+      <Link to='/home'>home</Link>
+      &nbsp;
+      <Link to='/about'>about</Link>
+      &nbsp;
+      <Link to='/123' onClick={(to, next) => {
+        console.log(to);
+        next('/404');
+      }}>404</Link>
+    </nav>
+    <Router>
+      <Route path='/home' element={<Home />} />
+      <Route path='/about' element={<About />} />
+      <Route element={<h1>404</h1>} />
+    </Router>
+  </div>
 }
 
-export default App;
+function Home() {
+  const [count, setCount] = useState(0);
+  return <div>Home
+    <button onclick={() => setCount(count + 1)}>{count}</button>
+  </div>
+}
+function About() {
+  const [count, setCount] = useState(0);
+  return <div>About
+    <button onclick={() => setCount(count + 1)}>{count}</button>
+  </div>
+}
+
+export default App2;
