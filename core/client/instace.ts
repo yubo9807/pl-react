@@ -1,5 +1,5 @@
 import { Callback, Context, Effect, Memo, Ref, State, Expose, Reducer, Store } from "../hooks";
-import { AnyObj, cache, customForEach, isString } from "../utils";
+import { AnyObj, cache, customForEach, isString, len, nextTick } from "../utils";
 import { JsxToNodes } from "../client/jsx-node";
 import { isTree } from "../common";
 import type { Component, CompTree } from "../common/type";
@@ -28,11 +28,22 @@ export function createApp() {
   }
   const hooksValues = Object.values(hooks);
 
+  const updateMap = new WeakMap<CompTree, any[]>();
   /**
    * 组件内数据更新
    */
   function stateUpdate(tree: CompTree) {
-    structure.updateComp(tree);
+    // 保证被多次触发只更新一次
+    const arr = updateMap.get(tree) || [];
+    arr.push(1);
+    updateMap.set(tree, arr);
+    const size = len(arr);
+    nextTick(() => {
+      if (len(arr) === size) {
+        structure.updateComp(tree);  // 更新组件
+        updateMap.delete(tree);
+      }
+    })
 
     // hooks.effect.run(tree);
   }

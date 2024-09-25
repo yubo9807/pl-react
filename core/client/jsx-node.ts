@@ -232,10 +232,11 @@ export class JsxToNodes {
    * @param tree 
    */
   updateComp(tree: CompTree) {
-    const newTree = this.compTreeExec(tree);
     const backup = this.treeMap.get(tree);
+    if (!backup) return;
 
     const self = this;
+    const newTree = this.compTreeExec(tree);
     updateTree(newTree, backup.tree, backup.nodes); 
     backup.tree = newTree;  // 旧数据替换
 

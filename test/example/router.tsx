@@ -1,6 +1,5 @@
 import { h, useMemo, useState } from "~/core"
 import { createRouter } from "~/core/router";
-import { nextTick } from "~/core/utils";
 
 function App() {
   const [child, setChild] = useState();
@@ -13,9 +12,7 @@ function App() {
         { element: <h1>404</h1> }
       ],
       controls(route) {
-        nextTick(() => {
-          setChild(route.element);
-        })
+        setChild(route.element);
       },
     });
   }, [])

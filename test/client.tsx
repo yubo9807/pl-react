@@ -1,7 +1,7 @@
 
 import { h } from '~/core';
 import App from './app';
-import { createApp } from '~/core/instance/app';
+import { createApp } from '~/core';
 import { MyComp } from './components/my-comp';
 
 const app = createApp();
