@@ -1,11 +1,11 @@
 import { Callback, Context, Effect, Memo, Ref, State, Expose, Reducer, Store } from "../hooks";
-import { AnyObj, cache, customForEach, isString, len, nextTick } from "../utils";
+import { AnyObj, customForEach, isString, len, nextTick } from "../utils";
 import { JsxToNodes } from "../client/jsx-node";
 import { isTree } from "../common";
 import type { Component, CompTree } from "../common/type";
 // import { clearCompTree, collectChildTree } from "./tree";
 
-let currentApp: () => ReturnType<typeof createApp>;
+let currentApp: ReturnType<typeof createApp>;
 
 export function createApp() {
 
@@ -63,6 +63,7 @@ export function createApp() {
     },
 
     currentCompTree(tree) {
+      currentApp = instance;
       customForEach(hooksValues, hook => {
         hook.setInstance(tree);
       })
@@ -126,7 +127,7 @@ export function createApp() {
      * @returns 
      */
     refresh(tree: CompTree) {
-      return structure.updateComp(tree);
+      return stateUpdate(tree);
     },
     /**
      * 卸载应用
@@ -142,42 +143,51 @@ export function createApp() {
     getCompResult(tree: CompTree) {
       return structure.treeMap.get(tree);
     },
+    use(plugin: { install: (instance: ReturnType<typeof createApp>) => void }) {
+      plugin.install(instance);
+      return instance;
+    }
   }
 
-  currentApp = () => instance;
+  currentApp = instance;
   return instance;
 }
 
-// 使用缓存中的 app，防止多次 createApp 后而导致实例混乱
-export const getCurrnetInstance = (): ReturnType<typeof createApp> => cache(currentApp);
+/**
+ * 获取当前实例
+ * @returns 
+ */
+export function getCurrnetInstance() {
+  return currentApp;
+}
 
 export const useState: State['use'] = (initialValue) => {
-  return getCurrnetInstance().state.use(initialValue);
+  return currentApp.state.use(initialValue);
 }
 export const useMemo: Memo['use'] = (memo, deps) => {
-  return getCurrnetInstance().memo.use(memo, deps);
+  return currentApp.memo.use(memo, deps);
 }
 export const useEffect: Effect['use'] = (effect, deps) => {
-  return getCurrnetInstance().effect.use(effect, deps);
+  return currentApp.effect.use(effect, deps);
 }
 export const useLayoutEffect: Effect['use'] = (effect, deps) => {
-  return getCurrnetInstance().layoutEffect.use(effect, deps);
+  return currentApp.layoutEffect.use(effect, deps);
 }
 export const useCallback: Callback['use'] = (callback, deps) => {
-  return getCurrnetInstance().callback.use(callback, deps);
+  return currentApp.callback.use(callback, deps);
 }
 export const useRef: Ref['use'] = (value) => {
-  return getCurrnetInstance().ref.use(value);
+  return currentApp.ref.use(value);
 }
 export const useContext: Context['use'] = (context) => {
-  return getCurrnetInstance().context.use(context);
+  return currentApp.context.use(context);
 }
 export const useImperativeHandle: Expose['use'] = (ref, handle, deps) => {
-  return getCurrnetInstance().expose.use(ref, handle, deps);
+  return currentApp.expose.use(ref, handle, deps);
 }
 export const useReducer: Reducer['use'] = (reducer, initialState, init) => {
-  return getCurrnetInstance().reducer.use(reducer, initialState, init);
+  return currentApp.reducer.use(reducer, initialState, init);
 }
 export const useStore: Store['use'] = (result) => {
-  return getCurrnetInstance().store.use(result);
+  return currentApp.store.use(result);
 }

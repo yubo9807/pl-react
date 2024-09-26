@@ -6,9 +6,9 @@ import reducer from './example/reducer';
 import keepAlive from './example/keep-alive';
 import store from './example/store';
 import router from './example/router';
+import instance from './example/instance';
 
 export default router;
 
 import * as r from '~/core'
-import * as c from '~/core/components'
-console.log(r, c)
+console.log(r)
