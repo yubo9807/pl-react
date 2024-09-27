@@ -1,7 +1,7 @@
-import { isFragment, isTree, joinClass } from "../common";
-import { BaseComponent, CompTree, NodeTree, TreeValue } from "../common/type";
+import { isFragment, isTree, joinClass } from "../tools";
+import { BaseComponent, CompTree, NodeTree, TreeValue } from "../tools/type";
 import { customForEach, isClass, isObject, isString } from "../utils";
-export { h, Fragment } from "../common";
+export { h, Fragment } from "../tools";
 
 type Option = {
   /**

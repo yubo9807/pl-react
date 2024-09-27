@@ -1,5 +1,5 @@
 import { isEmpty, len } from "../utils";
-import { Children, PropsType, Tag } from "../common/type";
+import { Children, PropsType, Tag } from "../tools/type";
 
 export function h(tag: Tag, attrs: PropsType = {}, ...children: Children) {
   attrs ||= {};

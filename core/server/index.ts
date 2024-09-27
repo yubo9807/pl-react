@@ -1,2 +1,2 @@
 export * from './instace';
-export { h, Fragment } from '../common';
+export { h, Fragment } from '../tools';

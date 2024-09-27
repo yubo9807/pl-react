@@ -1,8 +1,8 @@
 import { Callback, Context, Effect, Memo, Ref, State, Expose, Reducer, Store } from "../hooks";
 import { AnyObj, customForEach, isString, len, nextTick } from "../utils";
 import { JsxToNodes } from "../client/jsx-node";
-import { isTree } from "../common";
-import type { Component, CompTree } from "../common/type";
+import { isTree } from "../tools";
+import type { Component, CompTree } from "../tools/type";
 // import { clearCompTree, collectChildTree } from "./tree";
 
 export let currentApp: ReturnType<typeof createApp>;

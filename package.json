@@ -7,8 +7,8 @@
   "types": "lib/index.d.ts",
   "exports": {
     ".": {
-      "import": "./lib/client/index.js",
-      "require": "./lib/client/index.cjs"
+      "import": "./lib/index.js",
+      "require": "./lib/index.cjs"
     },
     "./utils": {
       "import": "./lib/utils/index.js",
