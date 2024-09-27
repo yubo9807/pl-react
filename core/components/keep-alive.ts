@@ -1,6 +1,6 @@
 import { customForEach } from "../utils"
 import { h, Fragment, isCompTree, isTree } from "../common";
-import { getCurrnetInstance, useLayoutEffect, useMemo } from '../client'
+import { getCurrnetInstance, useLayoutEffect, useMemo } from '..'
 import type { CompTree, Tree, TreeValue } from "../common/type"
 
 type Key = string | Function

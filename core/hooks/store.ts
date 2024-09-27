@@ -1,5 +1,5 @@
 import { Reducer, ReducerAction, ReducerHandle } from "./reducer";
-import { getCurrnetInstance } from "../client/instace";
+import { getCurrnetInstance } from "..";
 import { BasicHook, useInstanceTips } from "./utils";
 import type { CompTree } from "../common/type";
 

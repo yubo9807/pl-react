@@ -6,6 +6,7 @@ function App() {
 
   const router = useMemo(() => {
     return createRouter({
+      fristUrl: location.href.replace(location.origin, ''),
       routes: [
         { path: /^\/home(\/?|)$/, element: <Home /> },
         { path: /^\/about(\/?|\/.+)$/, element: <About /> },
@@ -51,11 +52,16 @@ function App2() {
   </div>
 }
 
-function Home() {
+function Home(props) {
+  console.log(props)
   const [count, setCount] = useState(0);
   return <div>Home
     <button onclick={() => setCount(count + 1)}>{count}</button>
   </div>
+}
+Home.getInitialProps = async () => {
+  await delay(1000);
+  return { count: 1 }
 }
 function About() {
   const [count, setCount] = useState(0);
@@ -65,3 +71,7 @@ function About() {
 }
 
 export default App2;
+
+function delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}

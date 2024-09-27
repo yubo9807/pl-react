@@ -9,6 +9,3 @@ import router from './example/router';
 import instance from './example/instance';
 
 export default router;
-
-import * as r from '~/core'
-console.log(r)

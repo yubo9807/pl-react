@@ -5,7 +5,7 @@ import { isTree } from "../common";
 import type { Component, CompTree } from "../common/type";
 // import { clearCompTree, collectChildTree } from "./tree";
 
-let currentApp: ReturnType<typeof createApp>;
+export let currentApp: ReturnType<typeof createApp>;
 
 export function createApp() {
 
@@ -151,43 +151,4 @@ export function createApp() {
 
   currentApp = instance;
   return instance;
-}
-
-/**
- * 获取当前实例
- * @returns 
- */
-export function getCurrnetInstance() {
-  return currentApp;
-}
-
-export const useState: State['use'] = (initialValue) => {
-  return currentApp.state.use(initialValue);
-}
-export const useMemo: Memo['use'] = (memo, deps) => {
-  return currentApp.memo.use(memo, deps);
-}
-export const useEffect: Effect['use'] = (effect, deps) => {
-  return currentApp.effect.use(effect, deps);
-}
-export const useLayoutEffect: Effect['use'] = (effect, deps) => {
-  return currentApp.layoutEffect.use(effect, deps);
-}
-export const useCallback: Callback['use'] = (callback, deps) => {
-  return currentApp.callback.use(callback, deps);
-}
-export const useRef: Ref['use'] = (value) => {
-  return currentApp.ref.use(value);
-}
-export const useContext: Context['use'] = (context) => {
-  return currentApp.context.use(context);
-}
-export const useImperativeHandle: Expose['use'] = (ref, handle, deps) => {
-  return currentApp.expose.use(ref, handle, deps);
-}
-export const useReducer: Reducer['use'] = (reducer, initialState, init) => {
-  return currentApp.reducer.use(reducer, initialState, init);
-}
-export const useStore: Store['use'] = (result) => {
-  return currentApp.store.use(result);
 }

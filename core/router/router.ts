@@ -1,9 +1,14 @@
-import { h, Fragment, useState, useMemo, CompTree, useEffect, StyleObject } from "../client";
+import { h, Fragment, useState, useMemo, CompTree, useEffect, StyleObject } from "..";
 import { RefItem } from "../hooks";
-import { isObject } from "../utils";
-import { collect, createRouter, queryRoute, useRouter } from "./create-router";
+import { renderToString } from "../server";
+import { isClient, isFunction, isObject, nextTick } from "../utils";
+import { createId } from "../utils/string";
+import { collect, createRouter, useRouter } from "./create-router";
+import { temp } from "./ssr-outlet";
 import { RouteConfig, RouteItem } from "./type";
 import { stringifyUrl } from "./utils";
+
+let count = 0;
 
 type Props = {
   base?:     string
@@ -17,18 +22,39 @@ export function Router(props: Props) {
     if (route.path) route.path = (base || '') + route.path;
     return route;
   }), []);
-  const fristUrl = useMemo(() => location.href.replace(location.origin, ''), [])
-  const [child, setChild] = useState(() => {
-    const query = queryRoute(routes, fristUrl);
-    return query && query.element;
-  });
+
+  const client = isClient();
+  const [child, setChild] = useState(client ? null : 'r_' + createId());
+
+  function updateChild(tree) {
+    count --;
+    if (client) {
+      setChild(tree);
+    } else {
+      nextTick(() => {
+        const result = temp.text.replace(child, renderToString(tree));
+        count === 0 && temp.done(result);
+      })
+    }
+  }
 
   const router = useMemo(() => {
+    count ++;
     return createRouter({
+      fristUrl: client ? location.href.replace(location.origin, '') : temp.url,
       base: props.base,
       routes,
       controls(route) {
-        setChild(route.element);
+        const tree = route.element
+        const { getInitialProps } = tree.tag;
+        if (isFunction(getInitialProps)) {
+          getInitialProps().then(res => {
+            tree.attrs.data = res;
+            updateChild(tree);
+          })
+        } else {
+          updateChild(tree);
+        }
       },
     });
   }, [])

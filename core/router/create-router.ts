@@ -15,6 +15,7 @@ export function queryRoute(routes: RouteItem[], pathname: string) {
 }
 
 type Option = {
+  fristUrl:    string
   routes:      RouteItem[]
   controls:    (route: RouteItem) => void
   base?:       string
@@ -28,8 +29,7 @@ class Router {
     const { beforeEach, ...rest } = option;
     beforeEach && (this.beforeEach = beforeEach);
     this.option = rest;
-    const href = location.href.replace(location.origin, '');
-    this._jump(href, () => {});
+    this._jump(option.fristUrl, () => {});
   }
 
   beforeEach = (from: RouteConfig, to: RouteConfig, next: Function) => next();
@@ -43,7 +43,7 @@ class Router {
       to = parseUrl(to);
     }
 
-    const { base, routes: children, controls } = this.option;
+    const { base, routes, controls } = this.option;
     if (!to.path.startsWith(base || '')) {
       this.isPass = false;
       return;
@@ -56,7 +56,7 @@ class Router {
     this.beforeEach(to, from, () => {
       callback(href);
       this.currentRoute = to as RouteConfig;
-      const query = queryRoute(children, href);
+      const query = queryRoute(routes, href);
       query && controls(query);
     });
   }
