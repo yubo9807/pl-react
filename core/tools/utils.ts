@@ -1,6 +1,6 @@
 import { isFragment } from './h';
-import { CompTree, Tree } from "./type";
-import { customForEach, isEmpty, isEquals, isFunction, isObject } from "../utils";
+import { BaseComponent, CompTree, Tree, TreeValue } from "./type";
+import { customForEach, isClass, isEmpty, isEquals, isFunction, isObject } from "../utils";
 
 export function isTree(tree: any): tree is Tree {
   return isObject(tree) && isObject(tree.attrs);
@@ -13,6 +13,26 @@ export function isTree(tree: any): tree is Tree {
  */
 export function isCompTree(tree: Tree): tree is CompTree {
   return !isFragment(tree.tag) && isFunction(tree.tag);
+}
+
+/**
+ * 组件执行
+ * @param tree 
+ * @returns 
+ */
+export function compExec(tree: CompTree): TreeValue {
+  const { tag, attrs, children } = tree;
+  const props = { ...attrs, children };
+
+  let comp = tag as BaseComponent;
+
+  if (isClass(tag)) {
+    // 将类组件变为函数组件
+    const t = new tag(props);
+    comp = t.render();
+  }
+
+  return comp(props);
 }
 
 export enum DiffType {

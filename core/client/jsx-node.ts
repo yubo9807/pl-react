@@ -1,8 +1,8 @@
-import { customForEach, isClass, isObject, isString, isEmpty, isEquals, isArray } from "../utils";
+import { customForEach, isObject, isString, isEmpty, isEquals, isArray } from "../utils";
 import { nodes_after, nodes_remove, nodes_replaceWith, WithNode } from "./dom";
-import { isFragment, isCompTree, isTree, diffObject, DiffType, joinClass } from "../tools";
+import { isFragment, isCompTree, isTree, diffObject, DiffType, joinClass, compExec } from "../tools";
 import { getKeepAliveBackup } from "../components/keep-alive";
-import type { BaseComponent, TreeValue, CompTree, NodeTree } from "../tools/type";
+import type { TreeValue, CompTree, NodeTree } from "../tools/type";
 
 type Option = {
   /**
@@ -161,18 +161,7 @@ export class JsxToNodes {
     const { currentCompTree, created } = this.option;
     currentCompTree?.(tree);
 
-    const { tag, attrs, children } = tree;
-    const props = { ...attrs, children };
-
-    let comp = tag as BaseComponent;
-
-    if (isClass(tag)) {
-      // 将类组件变为函数组件
-      const t = new tag(props);
-      comp = t.render();
-    }
-
-    const newTree = comp(props);
+    const newTree = compExec(tree);
     created?.(tree, newTree);
 
     return newTree;

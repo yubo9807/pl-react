@@ -1,12 +1,10 @@
-import { h, Fragment, useState, useMemo, CompTree, useEffect, StyleObject } from "..";
-import { RefItem } from "../hooks";
+import { h, Fragment, useState, useMemo, CompTree, useEffect } from "..";
 import { renderToString } from "../server";
-import { isClient, isFunction, isObject, nextTick } from "../utils";
+import { isClient, isFunction, nextTick } from "../utils";
 import { createId } from "../utils/string";
-import { collect, createRouter, useRouter } from "./create-router";
+import { collect, createRouter } from "./create-router";
 import { temp } from "./ssr-outlet";
-import { RouteConfig, RouteItem } from "./type";
-import { stringifyUrl } from "./utils";
+import { RouteItem } from "./type";
 
 let count = 0;
 
@@ -70,43 +68,3 @@ export function Router(props: Props) {
 }
 
 export function Route(props: RouteItem) {}
-
-type LinkProps = {
-  to:         RouteConfig | string
-  type?:      'push' | 'replace'
-  className?: string | string[]
-  style?:     StyleObject
-  ref?:       RefItem<HTMLAnchorElement>
-  children?:  any[]
-  onClick?:   (to: string, next: (to?: RouteConfig | string) => void) => void
-} & {
-  [K in keyof HTMLAnchorElement]?: HTMLAnchorElement[K]
-}
-export function Link(props: LinkProps) {
-  const { to, type, children, onClick, ...args } = props;
-  if (isObject(to)) {
-    props.to = stringifyUrl(to);
-  }
-
-  const router = useRouter();
-
-  function onclick(e) {
-    e.preventDefault();
-
-    function next(to = props.to) {
-      router[type === 'replace' ? 'replace' : 'push'](to)
-    }
-
-    if (onClick) {
-      onClick(to as string, next);
-    } else {
-      next();
-    }
-  }
-
-  return h('a', {
-    ...args,
-    href: props.to,
-    onclick,
-  }, ...children);
-}

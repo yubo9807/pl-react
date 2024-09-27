@@ -1,7 +1,6 @@
-import { Callback, Context, Effect, Memo, Ref, State, Expose, Reducer, Store } from "../hooks";
 import { AnyObj, customForEach, isString, len, nextTick } from "../utils";
 import { JsxToNodes } from "../client/jsx-node";
-import { isTree } from "../tools";
+import { initHooks, isTree } from "../tools";
 import type { Component, CompTree } from "../tools/type";
 // import { clearCompTree, collectChildTree } from "./tree";
 
@@ -14,18 +13,7 @@ export function createApp() {
     globalCompMap.set(name, comp);
   }
 
-  const hooks = {
-    state:        new State({ update: stateUpdate }),
-    memo:         new Memo(),
-    effect:       new Effect(),
-    callback:     new Callback(),
-    layoutEffect: new Effect(),
-    ref:          new Ref(),
-    expose:       new Expose(),
-    context:      new Context(),
-    reducer:      new Reducer({ update: stateUpdate }),
-    store:        new Store(),
-  }
+  const hooks = initHooks(stateUpdate);
   const hooksValues = Object.values(hooks);
 
   const updateMap = new WeakMap<CompTree, any[]>();
@@ -143,7 +131,7 @@ export function createApp() {
     getCompResult(tree: CompTree) {
       return structure.treeMap.get(tree);
     },
-    use(plugin: { install: (instance: ReturnType<typeof createApp>) => void }) {
+    use(plugin: { install: (instance) => void }) {
       plugin.install(instance);
       return instance;
     }

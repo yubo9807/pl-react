@@ -14,9 +14,9 @@
       "import": "./lib/utils/index.js",
       "require": "./lib/utils/index.cjs"
     },
-    "./common": {
-      "import": "./lib/common/index.js",
-      "require": "./lib/common/index.cjs"
+    "./tools": {
+      "import": "./lib/tools/index.js",
+      "require": "./lib/tools/index.cjs"
     },
     "./client": {
       "import": "./lib/client/index.js",

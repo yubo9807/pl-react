@@ -1,26 +1,11 @@
-import { CompTree, TreeValue } from "../client";
-import { Callback, Context, Effect, Memo, Ref, State, Expose, Reducer, Store } from "../hooks";
-import { customForEach } from "../utils";
+import { TreeValue } from "../client";
+import { initHooks } from "../tools";
+import { cache, customForEach } from "../utils";
 import { JsxToString } from "./jsx-string";
 
-export let currentApp: typeof hooks;
-
-const hooks = {
-  state:        new State({ update: stateUpdate }),
-  memo:         new Memo(),
-  effect:       new Effect(),
-  callback:     new Callback(),
-  layoutEffect: new Effect(),
-  ref:          new Ref(),
-  expose:       new Expose(),
-  context:      new Context(),
-  reducer:      new Reducer({ update: stateUpdate }),
-  store:        new Store(),
-}
-const hooksValues = Object.values(hooks);
-function stateUpdate(tree: CompTree) {}
-
-export function renderToString(tree: TreeValue) {
+function instace() {
+  const hooks = initHooks(() => {})
+  const hooksValues = Object.values(hooks);
 
   const structure = new JsxToString({
     currentCompTree(tree) {
@@ -30,9 +15,14 @@ export function renderToString(tree: TreeValue) {
     }
   })
 
-  currentApp ??= {
+  return {
     ...hooks,
+    render: structure.render.bind(structure),
   }
+}
 
-  return structure.render(tree);
+export const currentApp: ReturnType<typeof instace> = cache(instace);
+
+export function renderToString(tree: TreeValue) {
+  return currentApp.render(tree);
 }

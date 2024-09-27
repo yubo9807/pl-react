@@ -13,7 +13,7 @@ const builds = [
     external: ['../utils'],
   },
   {
-    file: 'common/index',
+    file: 'tools/index',
     external: ['../utils'],
   },
   {
@@ -21,12 +21,12 @@ const builds = [
     external: ['../utils', '../hooks', '../tools'],
   },
   {
-    file: 'index',
-    external: ['../utils', '../hooks', '../tools', '../client',],
-  },
-  {
     file: 'server/index',
     external: ['../utils', '../hooks', '../tools'],
+  },
+  {
+    file: 'index',
+    external: ['./utils', './hooks', './tools', './client', '.server'],
   },
   {
     file: 'components/index',

@@ -1,6 +1,6 @@
-import { isFragment, isTree, joinClass } from "../tools";
-import { BaseComponent, CompTree, NodeTree, TreeValue } from "../tools/type";
-import { customForEach, isClass, isObject, isString } from "../utils";
+import { compExec, isFragment, isTree, joinClass } from "../tools";
+import { CompTree, NodeTree, TreeValue } from "../tools/type";
+import { customForEach, isObject, isString } from "../utils";
 export { h, Fragment } from "../tools";
 
 type Option = {
@@ -82,18 +82,7 @@ export class JsxToString {
   createComp(tree: CompTree) {
     const { currentCompTree } = this.option;
     currentCompTree?.(tree);
-
-    const { tag, attrs, children } = tree;
-    const props = { ...attrs, children };
   
-    let comp = tag as BaseComponent;
-  
-    if (isClass(tag)) {
-      // 将类组件变为函数组件
-      const t = new tag(props);
-      comp = t.render();
-    }
-  
-    return this.render(comp(props));
+    return this.render(compExec(tree));
   }
 }

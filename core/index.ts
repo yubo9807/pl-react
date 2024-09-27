@@ -3,6 +3,7 @@ import { currentApp as clientCurrentApp } from './client';
 import { currentApp as serverCurrentApp } from './server';
 import type { Callback, Context, Effect, Expose, Memo, Reducer, Ref, State, Store } from './hooks';
 export * from './client'
+export { defineStore } from './hooks';
 
 const client = isClient();
 
@@ -10,7 +11,8 @@ const client = isClient();
  * 获取当前实例
  * @returns 
  */
-export function getCurrnetInstance() {
+export function getCurrnetInstance(): typeof clientCurrentApp {
+  // @ts-ignore
   return client ? clientCurrentApp : serverCurrentApp;
 }
 
