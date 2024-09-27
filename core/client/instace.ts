@@ -1,7 +1,7 @@
 import { AnyObj, customForEach, isString, len, nextTick } from "../utils";
 import { JsxToNodes } from "../client/jsx-node";
 import { initHooks, isTree } from "../tools";
-import type { Component, CompTree } from "../tools/type";
+import type { Component, CompTree, Tree } from "../tools/type";
 // import { clearCompTree, collectChildTree } from "./tree";
 
 export let currentApp: ReturnType<typeof createApp>;
@@ -94,10 +94,15 @@ export function createApp() {
     },
   });
 
+  function convert(tree: Tree) {
+    return structure.render(tree);
+  }
+
   let rootTree: CompTree
   const instance = {
     ...hooks,
     useComponent,
+    convert,
     /**
      * 渲染组件，并挂载到父节点上
      * @param tree 
@@ -105,7 +110,7 @@ export function createApp() {
      */
     render(tree: CompTree, parent?: HTMLElement) {
       rootTree = tree;
-      const nodes = structure.render(tree);
+      const nodes = convert(tree);
       parent && parent.append(...nodes);
       return nodes;
     },

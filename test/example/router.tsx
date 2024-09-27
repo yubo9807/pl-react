@@ -1,5 +1,5 @@
 import { h, useMemo, useState } from "~/core"
-import { createRouter, Router, Route, useRouter, Link } from "~/core/router";
+import { createRouter, Router, Route, useRouter, Link, Helmet } from "~/core/router";
 
 function App() {
   const [child, setChild] = useState();
@@ -55,7 +55,12 @@ function App2() {
 function Home(props) {
   console.log(props)
   const [count, setCount] = useState(0);
-  return <div>Home
+
+  return <div>
+    <Helmet config={{
+      'helmet_title': <title>首页</title>
+    }} />
+    Home
     <button onclick={() => setCount(count + 1)}>{count}</button>
   </div>
 }

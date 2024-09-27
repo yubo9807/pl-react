@@ -1,6 +1,7 @@
 import { createServer } from 'http';
 import App from './app';
 import { ssrOutlet } from "~/core/router";
+import { h } from "~/core/tools";
 import { extname, resolve } from 'path';
 import { readFile, readFileSync } from 'fs';
 
@@ -70,8 +71,8 @@ const server = createServer(async (req, res) => {
     });
   } else {
     // 服务端渲染
-    ssrOutlet(url, App).then(content => {
-      res.write(html.replace('<!--ssr-outlet-->', content));
+    ssrOutlet(url, h(App), html).then(content => {
+      res.write(content);
       res.end();
     })
   }
