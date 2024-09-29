@@ -8,4 +8,4 @@ import store from './example/store';
 import router from './example/router';
 import instance from './example/instance';
 
-export default router;
+export default context;

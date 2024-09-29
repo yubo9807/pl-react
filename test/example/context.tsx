@@ -16,9 +16,9 @@ function App() {
   return <>
     App: {count}
     <button onclick={add}>++</button>
-    <Context.Provider count={count} add={add}>
+    <Context count={count} add={add}>
       <Page />
-    </Context.Provider>
+    </Context>
   </>
 }
 
