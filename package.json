@@ -1,6 +1,6 @@
 {
   "name": "pl-react",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Pl React",
   "main": "lib/index.cjs",
   "module": "lib/index.js",
@@ -10,27 +10,27 @@
       "import": "./lib/index.js",
       "require": "./lib/index.cjs"
     },
-    "./utils": {
+    "./lib/utils": {
       "import": "./lib/utils/index.js",
       "require": "./lib/utils/index.cjs"
     },
-    "./types": {
+    "./lib/types": {
       "import": "./lib/types/index",
       "require": "./lib/types/index"
     },
-    "./tools": {
+    "./lib/tools": {
       "import": "./lib/tools/index.js",
       "require": "./lib/tools/index.cjs"
     },
-    "./server": {
+    "./lib/server": {
       "import": "./lib/server/index.js",
       "require": "./lib/server/index.cjs"
     },
-    "./components": {
+    "./lib/components": {
       "import": "./lib/components/index.js",
       "require": "./lib/components/index.cjs"
     },
-    "./router": {
+    "./lib/router": {
       "import": "./lib/router/index.js",
       "require": "./lib/router/index.cjs"
     }
