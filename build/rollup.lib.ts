@@ -10,11 +10,11 @@ const builds = [
   },
   {
     file: 'hooks/index',
-    external: ['../utils'],
+    external: ['../utils', '..'],
   },
   {
     file: 'tools/index',
-    external: ['../utils'],
+    external: ['../utils', '../hooks'],
   },
   {
     file: 'client/index',
@@ -22,7 +22,7 @@ const builds = [
   },
   {
     file: 'server/index',
-    external: ['../utils', '../hooks', '../tools'],
+    external: ['../utils', '../tools'],
   },
   {
     file: 'index',
@@ -30,11 +30,11 @@ const builds = [
   },
   {
     file: 'components/index',
-    external: ['../utils', '../hooks', '../tools', '../client', '..'],
+    external: ['../utils', '../tools', '../client', '..'],
   },
   {
     file: 'router/index',
-    external: ['../utils', '../hooks', '../tools', '../client', '..'],
+    external: ['../utils', '../tools', '../client', '..'],
   },
 ]
 async function esmBuild(file, external) {
