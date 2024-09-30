@@ -2,8 +2,8 @@ import { throwError } from "../utils";
 
 export type Instance = object;
 export class BasicHook<I> {
-  instance: Instance;
-  count   = 0;  // 钩子使用计数
+  instance: Instance
+  count:    number  // 钩子使用次数计数
   dataMap = new WeakMap<object, Map<number, I>>();
 
   /**

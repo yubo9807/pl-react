@@ -16,5 +16,5 @@ export function printError(msg: string) {
 * @param func 
 */
 export function nextTick(func: Function) {
-  Promise.resolve().then(func as any);
+  return Promise.resolve().then(func as any);
 }

@@ -18,10 +18,7 @@ export function h(tag: Tag, attrs: PropsType = {}, ...children: Children) {
 }
 
 export function Fragment() {}
-// const FragmentMark = Symbol('Fragment');
-// Fragment[FragmentMark] = FragmentMark;
 
 export function isFragment(tag: any): tag is typeof Fragment {
-  // return tag && tag[FragmentMark] === FragmentMark;
   return tag === Fragment;
 }
