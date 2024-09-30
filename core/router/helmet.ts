@@ -1,9 +1,10 @@
 import { getCurrnetInstance, useEffect, useMemo } from "..";
-import { Fragment, h, nodes_replaceWith } from "../client";
+import { Fragment, h } from "../tools";
+import { nodes_replaceWith } from "../client";
 import { renderToString } from "../server";
-import type { Tree } from "../client"
 import { customForEach, isClient } from "../utils";
 import { temp } from "./ssr-outlet";
+import type { Tree } from "../types"
 
 const nodeArr: [HTMLElement, HTMLElement[]][] = [];
 

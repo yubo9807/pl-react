@@ -1,10 +1,11 @@
-import { h, Fragment, useState, useMemo, CompTree, useEffect } from "..";
+import { h, Fragment, useState, useMemo, useEffect } from "..";
 import { renderToString } from "../server";
 import { isClient, isFunction, nextTick } from "../utils";
 import { createId } from "../utils/string";
 import { collect, createRouter } from "./create-router";
 import { temp } from "./ssr-outlet";
-import { RouteItem } from "./type";
+import type { CompTree } from "../types";
+import type { RouteItem } from "./type";
 
 let count = 0;
 

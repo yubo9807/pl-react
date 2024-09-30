@@ -1,7 +1,7 @@
 import { AnyObj, customForEach, isString, len, nextTick } from "../utils";
-import { JsxToNodes } from "../client/jsx-node";
+import { JsxToNodes } from "./jsx-node";
 import { initHooks, isTree } from "../tools";
-import type { Component, CompTree, Tree } from "../tools/type";
+import type { Component, CompTree, Tree } from "../types";
 // import { clearCompTree, collectChildTree } from "./tree";
 
 export let currentApp: ReturnType<typeof createApp>;

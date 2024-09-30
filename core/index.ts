@@ -2,7 +2,9 @@ import { isClient } from './utils';
 import { currentApp as clientCurrentApp } from './client';
 import { currentApp as serverCurrentApp } from './server';
 import type { Callback, Context, Effect, Expose, Memo, Reducer, Ref, State, Store } from './hooks';
-export * from './client'
+
+export { Fragment, h } from './tools';
+export { createApp } from './client'
 export { defineStore } from './hooks';
 
 const client = isClient();

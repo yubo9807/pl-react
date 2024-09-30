@@ -1,6 +1,6 @@
 import { AnyObj, customForEach, throwError } from "../utils";
 import { h, Fragment, getCurrnetInstance, useEffect, useLayoutEffect } from "..";
-import type { CompTree } from "../tools/type";
+import type { CompTree } from "../types";
 
 /**
  * 创建上下文

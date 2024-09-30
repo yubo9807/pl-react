@@ -1,10 +1,10 @@
-import type { StyleObject } from "../client"
-import type { RefItem } from "../hooks"
 import { isObject } from "../utils"
 import { h } from "../tools"
 import { useRouter } from "./create-router"
-import type { RouteConfig } from "./type"
 import { stringifyUrl } from "./utils"
+import type { RouteConfig } from "./type"
+import type { StyleObject } from "../types"
+import type { RefItem } from "../hooks"
 
 type LinkProps = {
   to:         RouteConfig | string

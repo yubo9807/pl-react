@@ -1,5 +1,5 @@
-import { TreeValue } from "../client";
 import { renderToString } from "../server";
+import type { TreeValue } from "../types";
 
 export let temp = {
   url: '',

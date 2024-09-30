@@ -2,7 +2,7 @@ import { customForEach, isObject, isString, isEmpty, isEquals, isArray } from ".
 import { nodes_after, nodes_remove, nodes_replaceWith, WithNode } from "./dom";
 import { isFragment, isCompTree, isTree, diffObject, DiffType, joinClass, compExec } from "../tools";
 import { getKeepAliveBackup } from "../components/keep-alive";
-import type { TreeValue, CompTree, NodeTree } from "../tools/type";
+import type { TreeValue, CompTree, NodeTree } from "../types";
 
 type Option = {
   /**

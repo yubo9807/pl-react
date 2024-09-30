@@ -1,5 +1,5 @@
 import { compExec, isFragment, isTree, joinClass } from "../tools";
-import { CompTree, NodeTree, TreeValue } from "../tools/type";
+import { CompTree, NodeTree, TreeValue } from "../types";
 import { customForEach, isObject, isString } from "../utils";
 export { h, Fragment } from "../tools";
 

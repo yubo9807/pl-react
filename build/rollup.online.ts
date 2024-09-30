@@ -1,7 +1,7 @@
 import { rollup } from 'rollup';
-import typescript2 from 'rollup-plugin-typescript2';
 import { replaceVersion } from './plugins/replace';
 import { terser } from 'rollup-plugin-terser';
+import typescript2 from 'rollup-plugin-typescript2';
 
 async function build(minifay: boolean) {
   const bundle = await rollup({

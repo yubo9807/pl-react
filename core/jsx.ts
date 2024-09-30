@@ -1,4 +1,4 @@
-import { StyleObject } from "./tools/type"
+import { StyleObject } from "./types"
 import { RefItem } from "./hooks"
 import { AnyObj, ExcludeKey } from "./utils"
 

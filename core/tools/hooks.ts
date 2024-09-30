@@ -1,5 +1,5 @@
 import { Callback, Context, Effect, Memo, Ref, State, Expose, Reducer, Store } from "../hooks";
-import type { CompTree } from "./type";
+import type { CompTree } from "../types";
 
 export function initHooks(update: (tree: CompTree) => void) {
   return {

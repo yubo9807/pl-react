@@ -1,7 +1,7 @@
 import { Reducer, ReducerAction, ReducerHandle } from "./reducer";
 import { getCurrnetInstance } from "..";
 import { BasicHook, useInstanceTips } from "./utils";
-import type { CompTree } from "../tools/type";
+import type { CompTree } from "../types";
 
 const map = new Map<object, Set<CompTree>>();
 

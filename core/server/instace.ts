@@ -1,7 +1,7 @@
-import { TreeValue } from "../client";
 import { initHooks } from "../tools";
 import { cache, customForEach } from "../utils";
 import { JsxToString } from "./jsx-string";
+import type { TreeValue } from "../types";
 
 function instace() {
   const hooks = initHooks(() => {})

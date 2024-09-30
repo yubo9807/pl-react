@@ -1,5 +1,5 @@
 import { isFragment } from './h';
-import { BaseComponent, CompTree, Tree, TreeValue } from "./type";
+import { BaseComponent, CompTree, Tree, TreeValue } from "../types";
 import { customForEach, isClass, isEmpty, isEquals, isFunction, isObject } from "../utils";
 
 export function isTree(tree: any): tree is Tree {

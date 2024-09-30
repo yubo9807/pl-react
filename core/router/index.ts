@@ -1,4 +1,4 @@
-export * from './create-router';
+export { createRouter, useRouter } from './create-router';
 export * from './router';
 export * from './link';
 export * from './helmet';

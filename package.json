@@ -14,13 +14,13 @@
       "import": "./lib/utils/index.js",
       "require": "./lib/utils/index.cjs"
     },
+    "./types": {
+      "import": "./lib/types/index",
+      "require": "./lib/types/index"
+    },
     "./tools": {
       "import": "./lib/tools/index.js",
       "require": "./lib/tools/index.cjs"
-    },
-    "./client": {
-      "import": "./lib/client/index.js",
-      "require": "./lib/client/index.cjs"
     },
     "./server": {
       "import": "./lib/server/index.js",
