@@ -224,138 +224,139 @@ export class JsxToNodes {
     const backup = this.treeMap.get(tree);
     if (!backup) return;
 
-    const self = this;
     const newTree = this.compTreeExec(tree);
-    updateTree(newTree, backup.tree, backup.nodes); 
+    this.updateTree(newTree, backup.tree, backup.nodes); 
     backup.tree = newTree;  // 旧数据替换
 
-    function updateTree(newTree: TreeValue, oldTree: TreeValue, nodes: WithNode[]) {
-      if (isTree(newTree) && isTree(oldTree)) {
+    return newTree;
+  }
 
-        // 节点发生变化，直接替换
-        if (newTree.tag !== oldTree.tag) {
-          if (isCompTree(oldTree)) {
-            self.destroyComp(oldTree, false);
+  updateTree(newTree: TreeValue, oldTree: TreeValue, nodes: WithNode[]) {
+    const self = this;
+
+    if (isTree(newTree) && isTree(oldTree)) {
+
+      // 节点发生变化，直接替换
+      if (newTree.tag !== oldTree.tag) {
+        if (isCompTree(oldTree)) {
+          self.destroyComp(oldTree, false);
+        }
+        const newNodes = self.render(newTree);
+        nodes_replaceWith(newNodes, nodes);
+        return newNodes;
+      }
+
+      // 节点片段
+      if (isFragment(newTree.tag)) {
+        const childNodes = self.fragmentMap.get(oldTree);
+        const newChildNodes: WithNode[] = [];
+        customForEach(newTree.children, (newChildTree, i) => {
+          const oldChildTree = oldTree.children[i];
+          const oldChildNode = childNodes[i];
+
+          // 无需更新的节点
+          if (isEquals(newChildTree, oldChildTree)) {
+            newChildNodes.push(oldChildNode);
+            return;
           }
-          const newNodes = self.render(newTree);
-          nodes_replaceWith(newNodes, nodes);
-          return newNodes;
-        }
 
-        // 节点片段
-        if (isFragment(newTree.tag)) {
-          const childNodes = self.fragmentMap.get(oldTree);
-          const newChildNodes: WithNode[] = [];
-          customForEach(newTree.children, (newChildTree, i) => {
-            const oldChildTree = oldTree.children[i];
-            const oldChildNode = childNodes[i];
+          let newNodes: WithNode[] = [];
+          if (isEmpty(oldChildTree)) {
+            // 新增节点
+            newNodes = self.render(newChildTree);
+            const lastChildNode = newChildNodes[i - 1];
+            nodes_after(newNodes, lastChildNode);
+          } else {
+            // 替换节点
+            const nodes = self.updateTree(newChildTree, oldChildTree, [oldChildNode]);
+            newNodes.push(...nodes);
+          }
+          newChildNodes.push(...newNodes);
+        })
 
-            // 无需更新的节点
-            if (isEquals(newChildTree, oldChildTree)) {
-              newChildNodes.push(oldChildNode);
-              return;
-            }
-
-            let newNodes: WithNode[] = [];
-            if (isEmpty(oldChildTree)) {
-              // 新增节点
-              newNodes = self.render(newChildTree);
-              const lastChildNode = newChildNodes[i - 1];
-              nodes_after(newNodes, lastChildNode);
-            } else {
-              // 替换节点
-              const nodes = updateTree(newChildTree, oldChildTree, [oldChildNode]);
-              newNodes.push(...nodes);
-            }
-            newChildNodes.push(...newNodes);
-          })
-
-          customForEach(childNodes, node => {
-            node.remove();
-          }, newTree.children.length);
-          self.fragmentMap.set(newTree, newChildNodes);
-          self.fragmentMap.delete(oldTree);
-          return newChildNodes;
-        }
-
-        // 普通节点
-        if (isString(newTree.tag)) {
-          const attrs = diffObject(newTree.attrs, oldTree.attrs);
-          const node = nodes[0];
-          customForEach(attrs, val => {
-            const { type, key, newValue } = val;
-            if (type === DiffType.remove) {
-              // 删除属性
-              node.removeAttribute(key === 'className' ? 'class' : key);
-            } else {
-              // 创建，更新属性
-              node[key] = newValue;
-            }
-          })
-
-          const childs = diffObject(newTree.children, oldTree.children);
-          const removeNodes: HTMLElement[] = [];
-          customForEach(childs, val => {
-            const { type, key, newValue, oldValue } = val;
-            const childNode = node.childNodes[key];
-
-            if (type === DiffType.reserve) {
-              // 需要替换回旧数据的子组件
-              newTree.children[key] = oldValue;
-            } else if (type === DiffType.remove) {
-              if (isTree(oldValue) && isCompTree(oldValue)) {
-                // 卸载子组件
-                self.destroyComp(oldValue);
-              } else {
-                // 删除子节点
-                removeNodes.push(childNode);
-              }
-            } else if (type === DiffType.create) {
-              // 添加子节点
-              const newNodes = self.render(newValue);
-              node.append(...newNodes);
-            } else {
-              // 组件
-              if (isTree(oldValue) && isCompTree(oldValue)) {
-                updateTree(newValue, oldValue, self.treeMap.get(oldValue).nodes);
-              } else {
-                updateTree(newValue, oldValue, [childNode]);
-              }
-            }
-          })
-
-          customForEach(removeNodes, node => node.remove());
-
-          return nodes;
-        }
-
-        // 组件更新
-        if (isCompTree(newTree)) {
-          self.replaceTreeMap(newTree, oldTree as CompTree);
-          const backup = self.treeMap.get(newTree);
-          const tree = self.compTreeExec(newTree);
-          const newNodes = updateTree(tree, backup.tree, nodes);
-          backup.tree = tree;
-          self.option.refresh?.(newTree, tree, nodes);
-          return newNodes;
-        }
-
+        customForEach(childNodes, node => {
+          node.remove();
+        }, newTree.children.length);
+        self.fragmentMap.set(newTree, newChildNodes);
+        self.fragmentMap.delete(oldTree);
+        return newChildNodes;
       }
 
-      // 删除节点
-      if (isEmpty(newTree)) {
-        nodes_remove(nodes);
-        return [];
+      // 普通节点
+      if (isString(newTree.tag)) {
+        const attrs = diffObject(newTree.attrs, oldTree.attrs);
+        const node = nodes[0];
+        customForEach(attrs, val => {
+          const { type, key, newValue } = val;
+          if (type === DiffType.remove) {
+            // 删除属性
+            node.removeAttribute(key === 'className' ? 'class' : key);
+          } else {
+            // 创建，更新属性
+            node[key] = newValue;
+          }
+        })
+
+        const childs = diffObject(newTree.children, oldTree.children);
+        const removeNodes: HTMLElement[] = [];
+        customForEach(childs, val => {
+          const { type, key, newValue, oldValue } = val;
+          const childNode = node.childNodes[key];
+
+          if (type === DiffType.reserve) {
+            // 需要替换回旧数据的子组件
+            newTree.children[key] = oldValue;
+          } else if (type === DiffType.remove) {
+            if (isTree(oldValue) && isCompTree(oldValue)) {
+              // 卸载子组件
+              self.destroyComp(oldValue);
+            } else {
+              // 删除子节点
+              removeNodes.push(childNode);
+            }
+          } else if (type === DiffType.create) {
+            // 添加子节点
+            const newNodes = self.render(newValue);
+            node.append(...newNodes);
+          } else {
+            // 组件
+            if (isTree(oldValue) && isCompTree(oldValue)) {
+              self.updateTree(newValue, oldValue, self.treeMap.get(oldValue).nodes);
+            } else {
+              self.updateTree(newValue, oldValue, [childNode]);
+            }
+          }
+        })
+
+        customForEach(removeNodes, node => node.remove());
+
+        return nodes;
       }
 
-      // 其他情况
-      const newNodes = self.render(newTree);
-      nodes_replaceWith(newNodes, nodes);
+      // 组件更新
+      if (isCompTree(newTree)) {
+        self.replaceTreeMap(newTree, oldTree as CompTree);
+        const backup = self.treeMap.get(newTree);
+        const tree = self.compTreeExec(newTree);
+        const newNodes = self.updateTree(tree, backup.tree, nodes);
+        backup.tree = tree;
+        self.option.refresh?.(newTree, tree, nodes);
+        return newNodes;
+      }
 
-      return newNodes;
     }
 
-    return newTree;
+    // 删除节点
+    if (isEmpty(newTree)) {
+      nodes_remove(nodes);
+      return [];
+    }
+
+    // 其他情况
+    const newNodes = self.render(newTree);
+    nodes_replaceWith(newNodes, nodes);
+
+    return newNodes;
   }
 
 }
