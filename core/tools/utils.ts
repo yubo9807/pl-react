@@ -29,7 +29,7 @@ export function compExec(tree: CompTree): TreeValue {
   if (isClass(tag)) {
     // 将类组件变为函数组件
     const t = new tag(props);
-    comp = t.render();
+    comp = t.render.bind(t);
   }
 
   return comp(props);

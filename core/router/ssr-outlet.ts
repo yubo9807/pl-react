@@ -5,6 +5,7 @@ export let temp = {
   url: '',
   html: '',
   text: '',
+  data: {},
   done(result: string) {}
 }
 
@@ -14,7 +15,11 @@ export function ssrOutlet(url: string, tree: TreeValue, html: string, replaceTex
     temp.html = html;
     temp.text = renderToString(tree);
     temp.done = result => {
-      const html = temp.html.replace(replaceText, result);
+      let template = temp.html;
+      const dataStr = `<script>window.g_initialProps = ${JSON.stringify(temp.data)}</script>`
+      const index = template.search('</body>');
+      template = template.slice(0, index) + dataStr + template.slice(index);
+      const html = template.replace(replaceText, result);
       resolve(html);
     };
   })
