@@ -135,9 +135,7 @@ export class JsxToNodes {
     const childNodes: WithNode[] = [];
     customForEach(tree.children, val => {
       const nodes = this.render(val);
-      customForEach(nodes, node => {
-        childNodes.push(node);
-      })
+      childNodes.push(...nodes);
     })
     this.fragmentMap.set(tree, childNodes);
 

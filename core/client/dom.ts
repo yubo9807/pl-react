@@ -16,8 +16,8 @@ export function nodes_replaceWith(newNodes: WithNode[], oldNodes: WithNode[]) {
       node.remove();
     }
   });
-  const lastNode = newNodes[newNodes.length - 1];
-  customForEach(newNodes, node => {
+  customForEach(newNodes, (node, i) => {
+    const lastNode = newNodes[i - 1];
     lastNode.after(node);
   }, oldNodes.length);
 }
