@@ -1,5 +1,5 @@
 import { customForEach, isObject, isString, isEmpty, isEquals, isArray } from "../utils";
-import { nodes_after, nodes_remove, nodes_replaceWith, WithNode } from "./dom";
+import { attrAssign, nodes_after, nodes_remove, nodes_replaceWith, WithNode } from "./dom";
 import { isFragment, isCompTree, isTree, diffObject, DiffType, joinClass, compExec } from "../tools";
 import { getKeepAliveBackup } from "../components/keep-alive";
 import type { TreeValue, CompTree, NodeTree } from "../types";
@@ -102,18 +102,7 @@ export class JsxToNodes {
     const el = document.createElement(tag);
 
     for (const key in attrs) {
-      let value = attrs[key];
-      if (key === 'style' && isObject(value)) {
-        for (const s in value) {
-          el[key][s] = value[s];
-        }
-        continue;
-      }
-
-      if (key === 'className' && isArray(value)) {
-        value = joinClass(...value);
-      }
-      el[key] = value;
+      attrAssign(el, key, attrs[key]);
     }
 
     customForEach(children, val => {
@@ -285,13 +274,14 @@ export class JsxToNodes {
         const attrs = diffObject(newTree.attrs, oldTree.attrs);
         const node = nodes[0];
         customForEach(attrs, val => {
-          const { type, key, newValue } = val;
+          const { type, key } = val;
+          let value = val.newValue;
           if (type === DiffType.remove) {
             // 删除属性
             node.removeAttribute(key === 'className' ? 'class' : key);
           } else {
             // 创建，更新属性
-            node[key] = newValue;
+            attrAssign(node, key, value);
           }
         })
 

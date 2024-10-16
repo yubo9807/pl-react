@@ -1,4 +1,5 @@
-import { customForEach } from "../utils";
+import { joinClass } from "../tools";
+import { AnyObj, customForEach, isArray, isObject } from "../utils";
 
 export type WithNode = HTMLElement
 
@@ -31,8 +32,32 @@ export function nodes_after(newNodes: WithNode[], lastNode: WithNode) {
   lastNode.after(...newNodes);
 }
 
+/**
+ * 删除节点
+ * @param newNodes 
+ */
 export function nodes_remove(newNodes: WithNode[]) {
   customForEach(newNodes, node => {
     node.remove();
   });
+}
+
+/**
+ * 属性赋值
+ * @param el 
+ * @param key 
+ * @param value 
+ */
+export function attrAssign(el: HTMLElement, key: string, value: any) {
+  if (key === 'style' && isObject(value)) {
+    for (const s in value) {
+      el[key][s] = value[s];
+    }
+    return;
+  }
+
+  if (key === 'className' && isArray(value)) {
+    value = joinClass(...value);
+  }
+  el[key] = value;
 }
