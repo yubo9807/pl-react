@@ -64,6 +64,15 @@ export function isClass(func: Function): func is WideClass {
 }
 
 /**
+ * 是否属于一个 Promise 对象
+ * @param result 
+ * @returns 
+ */
+export function isPromise(result: any): boolean {
+  return typeof result === 'object' && result[Symbol.toStringTag] === 'Promise';
+}
+
+/**
  * 是否为正则
  * @param value 
  * @returns 

@@ -8,13 +8,4 @@ import store from './example/store';
 import router from './example/router';
 import instance from './example/instance';
 
-export default context;
-
-import * as p from '~/core'
-import * as c from '~/core/components'
-import * as r from '~/core/router'
-import * as s from '~/core/server'
-console.log(p)
-console.log(c)
-console.log(r)
-console.log(s)
+export default router;

@@ -1,5 +1,5 @@
-import { h, useMemo, useState } from "~/core"
-import { createRouter, Router, Route, useRouter, Link, Helmet } from "~/core/router";
+import { Fragment, h, useMemo, useState } from "~/core"
+import { createRouter, Router, Route, useRouter, Link, Helmet, useRoute } from "~/core/router";
 
 function App() {
   const [child, setChild] = useState();
@@ -32,7 +32,6 @@ function App() {
 
 function App2() {
   const router = useRouter();
-
   return <div>
     <nav>
       <Link to='/home'>home</Link>
@@ -44,16 +43,16 @@ function App2() {
         next('/404');
       }}>404</Link>
     </nav>
-    <Router>
-      <Route path='/home' element={<Home />} />
-      <Route path='/about' element={<About />} />
-      <Route element={<h1>404</h1>} />
+
+    <Router loading={<div>loading</div>}>
+      <Route path='/home' element={Home} exact={false} />
+      <Route path='/about' element={About} />
+      <Route element={() => <h1>404</h1>} />
     </Router>
   </div>
 }
 
 function Home(props) {
-  console.log(props)
   const [count, setCount] = useState(0);
 
   return <div>
@@ -70,9 +69,10 @@ Home.getInitialProps = async () => {
 }
 function About() {
   const [count, setCount] = useState(0);
-  return <div>About
+  return <>
+    About
     <button onclick={() => setCount(count + 1)}>{count}</button>
-  </div>
+  </>
 }
 
 export default App2;

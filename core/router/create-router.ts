@@ -1,4 +1,5 @@
-import { isEquals, isRegExp, isString } from "../utils"
+import { isClient, isEquals, isRegExp, isString } from "../utils"
+import { temp } from "./ssr-outlet";
 import { BaseRoute, BeforeEach, RouteConfig, RouteItem } from "./type"
 import { parseUrl, stringifyUrl } from "./utils"
 
@@ -6,7 +7,7 @@ export function queryRoute(routes: RouteItem[], pathname: string) {
   for (const route of routes) {
     const { path, exact } = route;
     if (isRegExp(path) && path.test(pathname)) return route;
-    if (isString(path) && pathname === path) {
+    if (isString(path)) {
       if (exact === false && (pathname + '/').startsWith(path + '/')) return route;
       if (pathname === path) return route;
     }
@@ -104,4 +105,12 @@ export function useRouter() {
       common(router => router.replace(to));
     },
   }
+}
+
+export function useRoute() {
+  if (isClient()) {
+    const { href, origin } = location;
+    return parseUrl(href.replace(origin, ''));
+  }
+  return parseUrl(temp.url);
 }

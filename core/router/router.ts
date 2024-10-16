@@ -1,16 +1,19 @@
 import { h, Fragment } from '../tools';
 import { useState, useMemo, useEffect } from "..";
 import { renderToString } from "../server";
-import { isClient, isFunction, isObject, isString, nextTick } from "../utils";
+import { AnyObj, isClient, isFunction, isObject, isPromise, isString, nextTick } from "../utils";
 import { createId } from "../utils/string";
-import { collect, createRouter } from "./create-router";
+import { collect, createRouter, queryRoute } from "./create-router";
 import { temp } from "./ssr-outlet";
-import type { CompTree, TreeValue } from "../types";
-import type { RouteItem } from "./type";
+import type { Component, CompTree, Tree, TreeValue } from "../types";
+import type { BeforeEach, RouteItem } from "./type";
+import { parseUrl } from './utils';
 
 type Props = {
-  base?:     string
-  children?: CompTree[]
+  base?:       string
+  children?:   CompTree[]
+  loading?:    Component | TreeValue
+  beforeEach?: BeforeEach
 }
 function useRoutes(props: Props) {
   const { base, children } = props;
@@ -27,45 +30,66 @@ function getRouteKey(path: string | RegExp, url: string) {
 }
 
 export function BrowserRouter(props: Props) {
-  const { base } = props;
+  props.base ??= '';
+  const { base, loading, beforeEach } = props;
   const routes = useRoutes(props);
 
   const [child, setChild] = useState(null);
 
+  async function changeComp(route: RouteItem, url: string) {
+    const { path, element, meta } = route;
+    const key = getRouteKey(path, url);
+    const attrs: AnyObj = { path: base + key, meta }
+    const tree = { tag: element, attrs }
+
+    if (isPromise(element)) {
+      tree.tag = (await element).default;
+    }
+
+    const { getInitialProps } = element;
+
+    if (isFunction(getInitialProps)) {
+      // @ts-ignore
+      const { g_initialProps } = window;
+      if (isObject(g_initialProps) && g_initialProps.hasOwnProperty(key)) {
+        attrs.data = g_initialProps[key];
+        setChild(tree);
+        delete g_initialProps[key];
+      } else {
+        loading && setChild(loading);  // 组件无法直接渲染，先渲染loading
+        getInitialProps().then(res => {
+          tree.attrs.data = res;
+          setChild(tree);
+        })
+      }
+    } else {
+      setChild(tree);
+    }
+  }
+
   const router = useMemo(() => {
-    const fristUrl = location.href.replace(location.origin, '');
+    const fristUrl = location.pathname;
     return createRouter({
       fristUrl,
       base,
       routes,
+      beforeEach,
       controls(route) {
-        const tree = route.element;
-
-        const { getInitialProps } = tree.tag;
-        const key = getRouteKey(route.path, fristUrl);
-        // @ts-ignore
-        const { g_initialProps } = window;
-
-        if (isFunction(getInitialProps)) {
-          if (isObject(g_initialProps) && g_initialProps.hasOwnProperty(key)) {
-            tree.attrs.data = g_initialProps[key];
-            setChild(tree);
-            delete g_initialProps[key];
-          } else {
-            getInitialProps().then(res => {
-              tree.attrs.data = res;
-              setChild(tree);
-            })
-          }
-        } else {
-          setChild(tree);
-        }
+        changeComp(route, fristUrl);
       },
     });
   }, [])
 
-  // 组件卸载，删除路由
+
   useEffect(() => {
+    window.addEventListener('popstate', e => {
+      const { origin, href } = location;
+      const url = href.replace(origin + base, '');
+      const route = queryRoute(routes, url);
+      changeComp(route, url);
+    })
+
+    // 组件卸载，删除路由
     return () => {
       collect.delete(router);
     }
@@ -76,7 +100,8 @@ export function BrowserRouter(props: Props) {
 
 let count = 0;
 export function StaticRouter(props: Props) {
-  const { base } = props;
+  props.base ??= '';
+  const { base, beforeEach } = props;
 
   const routes = useRoutes(props);
 
@@ -92,21 +117,30 @@ export function StaticRouter(props: Props) {
 
   const router = useMemo(() => {
     count ++;
-    const fristUrl = temp.url;
+    const fristUrl = parseUrl(temp.url).path;
     return createRouter({
       fristUrl,
       base,
       routes,
-      controls(route) {
-        const tree = route.element;
+      beforeEach,
+      async controls(route) {
+        const { path, element, meta } = route;
+        const key = getRouteKey(path, fristUrl);
+        const attrs: AnyObj = { path: base + key, meta }
+        const tree = { tag: element, attrs } as Tree
+
+        if (isPromise(element)) {
+          tree.tag = (await element).default;
+        }
+
+        // @ts-ignore
         const { getInitialProps } = tree.tag;
         if (isFunction(getInitialProps)) {
           getInitialProps().then(res => {
             // 服务端数据
-            const key = getRouteKey(route.path, fristUrl);
             temp.data[key] = res;
 
-            tree.attrs.data = res;
+            attrs.data = res;
             replaceStr(tree);
           })
         } else {
