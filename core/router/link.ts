@@ -5,6 +5,7 @@ import { stringifyUrl } from "./utils"
 import type { RouteConfig } from "./type"
 import type { StyleObject } from "../types"
 import type { RefItem } from "../hooks"
+import { useState } from ".."
 
 type LinkProps = {
   to:         RouteConfig | string
@@ -18,12 +19,20 @@ type LinkProps = {
   [K in keyof HTMLAnchorElement]?: HTMLAnchorElement[K]
 }
 export function Link(props: LinkProps) {
-  const { to, type, children, onClick, ...args } = props;
+  const { to, type, children, onClick, className, ...args } = props;
   if (isObject(to)) {
     props.to = stringifyUrl(to);
   }
 
-  const router = useRouter();
+  const [classList, setClassList] = useState([]);
+  const router = useRouter(to => {
+    const routePath = props.to + '/', toPath = to.path + '/';
+    setClassList([
+      toPath.startsWith(routePath) ? 'active' : '',
+      toPath === routePath ? 'exact-active' : '',
+      ...[className].flat(),
+    ]);
+  });
 
   function onclick(e) {
     e.preventDefault();
@@ -41,6 +50,7 @@ export function Link(props: LinkProps) {
 
   return h('a', {
     ...args,
+    className: classList,
     href: props.to,
     onclick,
   }, ...children);

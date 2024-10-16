@@ -1,4 +1,4 @@
-import { isClient, isEquals, isRegExp, isString } from "../utils"
+import { customForEach, isClient, isEquals, isRegExp, isString } from "../utils"
 import { temp } from "./ssr-outlet";
 import { BaseRoute, BeforeEach, RouteConfig, RouteItem } from "./type"
 import { parseUrl, stringifyUrl } from "./utils"
@@ -14,6 +14,9 @@ export function queryRoute(routes: RouteItem[], pathname: string) {
     if (!path) return route;
   }
 }
+
+type RouterChangeFunc = (to: RouteConfig, from: RouteConfig) => void;
+const routerChangeFuncs: RouterChangeFunc[] = [];
 
 type Option = {
   fristUrl:    string
@@ -51,7 +54,7 @@ class Router {
     }
 
     const href = stringifyUrl(to);
-    const from = Object.assign({}, this.currentRoute);
+    const from = { ...this.currentRoute };
     if (isEquals(to, from)) return;
 
     this.beforeEach(to, from, () => {
@@ -59,6 +62,9 @@ class Router {
       this.currentRoute = to as RouteConfig;
       const query = queryRoute(routes, href);
       query && controls(query);
+      customForEach(routerChangeFuncs, func => {
+        func(to as RouteConfig, from);
+      })
     });
   }
 
@@ -96,7 +102,8 @@ function common(callback: (router: Router) => void) {
   }
 }
 
-export function useRouter() {
+export function useRouter(watch?: RouterChangeFunc) {
+  watch && routerChangeFuncs.push(watch);
   return {
     push(to: RouteConfig | string) {
       common(router => router.push(to));
