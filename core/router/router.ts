@@ -16,11 +16,8 @@ type Props = {
   beforeEach?: BeforeEach
 }
 function useRoutes(props: Props) {
-  const { base, children } = props;
-  return useMemo(() => children.map(item => {
-    const route = item.attrs as RouteItem
-    if (route.path) route.path = (base || '') + route.path;
-    return route;
+  return useMemo(() => props.children.map(item => {
+    return item.attrs as RouteItem
   }), []);
 }
 function getRouteKey(path: string | RegExp, url: string) {
@@ -37,6 +34,8 @@ export function BrowserRouter(props: Props) {
   const [child, setChild] = useState(null);
 
   async function changeComp(route: RouteItem, url: string) {
+    if (!route) return setChild(null);
+
     const { path, element, meta } = route;
     const key = getRouteKey(path, url);
     const attrs: AnyObj = { path: base + key, meta }
@@ -82,16 +81,18 @@ export function BrowserRouter(props: Props) {
 
 
   useEffect(() => {
-    window.addEventListener('popstate', e => {
+    function popstate(e: Event) {
       const { origin, href } = location;
       const url = href.replace(origin + base, '');
       const route = queryRoute(routes, url);
       changeComp(route, url);
-    })
+    }
+    window.addEventListener('popstate', popstate);
 
     // 组件卸载，删除路由
     return () => {
       collect.delete(router);
+      window.removeEventListener('popstate', popstate);
     }
   }, [])
 
@@ -124,6 +125,8 @@ export function StaticRouter(props: Props) {
       routes,
       beforeEach,
       async controls(route) {
+        if (!route) return replaceStr('');
+
         const { path, element, meta } = route;
         const key = getRouteKey(path, fristUrl);
         const attrs: AnyObj = { path: base + key, meta }

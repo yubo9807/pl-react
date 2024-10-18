@@ -1,5 +1,5 @@
 import { Fragment, h, useMemo, useState } from "~/core"
-import { createRouter, Router, Route, useRouter, Link, Helmet, useRoute } from "~/core/router";
+import { createRouter, Router, Route, useRouter, Link, Helmet } from "~/core/router";
 
 function App() {
   const [child, setChild] = useState();
@@ -10,7 +10,7 @@ function App() {
       routes: [
         { path: /^\/home(\/?|)$/, element: <Home /> },
         { path: /^\/about(\/?|\/.+)$/, element: <About /> },
-        { element: <h1>404</h1> }
+        { path: /./, element: <h1>404</h1> }
       ],
       controls(route) {
         setChild(route.element);
@@ -30,24 +30,25 @@ function App() {
   </div>
 }
 
+
 function App2() {
   const router = useRouter();
   return <div>
     <nav>
-      <Link to='/home'>home</Link>
+      <Link to='/admin/home'>home</Link>
       &nbsp;
-      <Link to='/about'>about</Link>
+      <Link to='/admin/about'>about</Link>
       &nbsp;
       <Link to='/123' onClick={(to, next) => {
         console.log(to);
-        next('/404');
+        next('/admin/404');
       }}>404</Link>
     </nav>
 
-    <Router loading={<div>loading</div>}>
+    <Router base="/admin" loading={<div>loading</div>}>
       <Route path='/home' element={Home} exact={false} />
       <Route path='/about' element={About} />
-      <Route element={() => <h1>404</h1>} />
+      <Route path={/./} element={() => <h1>404</h1>} />
     </Router>
   </div>
 }
@@ -61,12 +62,24 @@ function Home(props) {
     }} />
     Home
     <button onclick={() => setCount(count + 1)}>{count}</button>
+
+    <nav>
+      <Link to='/admin/home'>home</Link>
+      &nbsp;
+      <Link to='/admin/home/about'>about</Link>
+      &nbsp;
+    </nav>
+    {/* <div> */}
+      <Router base="/admin/home">
+        <Route path='/about' element={About} />
+      </Router>
+    {/* </div> */}
   </div>
 }
-Home.getInitialProps = async () => {
-  await delay(1000);
-  return { count: 1 }
-}
+// Home.getInitialProps = async () => {
+//   await delay(1000);
+//   return { count: 1 }
+// }
 function About() {
   const [count, setCount] = useState(0);
   return <>

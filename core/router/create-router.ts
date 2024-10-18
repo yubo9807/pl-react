@@ -11,7 +11,6 @@ export function queryRoute(routes: RouteItem[], pathname: string) {
       if (exact === false && (pathname + '/').startsWith(path + '/')) return route;
       if (pathname === path) return route;
     }
-    if (!path) return route;
   }
 }
 
@@ -21,7 +20,7 @@ const routerChangeFuncs: RouterChangeFunc[] = [];
 type Option = {
   fristUrl:    string
   routes:      RouteItem[]
-  controls:    (route: RouteItem) => void
+  controls:    (route?: RouteItem) => void
   base?:       string
   mode?:       'hash' | 'history'
   beforeEach?: BeforeEach
@@ -30,6 +29,7 @@ type Option = {
 class Router {
   option: Option
   constructor(option: Option) {
+    option.base ??= '';
     const { beforeEach, ...rest } = option;
     beforeEach && (this.beforeEach = beforeEach);
     this.option = rest;
@@ -39,29 +39,23 @@ class Router {
   beforeEach = (from: RouteConfig, to: RouteConfig, next: Function) => next();
 
   currentRoute: RouteConfig
-  isPass: boolean
 
   _jump(to: BaseRoute | string, callback: (url: string) => void) {
-    this.isPass = true;
     if (isString(to)) {
       to = parseUrl(to);
     }
 
     const { base, routes, controls } = this.option;
-    if (!to.path.startsWith(base || '')) {
-      this.isPass = false;
-      return;
-    }
 
     const href = stringifyUrl(to);
     const from = { ...this.currentRoute };
     if (isEquals(to, from)) return;
 
     this.beforeEach(to, from, () => {
+      const query = queryRoute(routes, href.replace(base, ''));
+      controls(query);
       callback(href);
       this.currentRoute = to as RouteConfig;
-      const query = queryRoute(routes, href);
-      query && controls(query);
       customForEach(routerChangeFuncs, func => {
         func(to as RouteConfig, from);
       })
@@ -98,7 +92,6 @@ export function createRouter(option: Option) {
 function common(callback: (router: Router) => void) {
   for (const router of collect.values()) {
     callback(router);
-    if (router.isPass) break;
   }
 }
 
