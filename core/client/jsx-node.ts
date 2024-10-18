@@ -1,6 +1,6 @@
-import { customForEach, isObject, isString, isEmpty, isEquals, isArray } from "../utils";
+import { customForEach, isObject, isString, isEmpty, isEquals } from "../utils";
 import { attrAssign, nodes_after, nodes_remove, nodes_replaceWith, WithNode } from "./dom";
-import { isFragment, isCompTree, isTree, diffObject, DiffType, joinClass, compExec } from "../tools";
+import { isFragment, isCompTree, isTree, diffObject, DiffType, compExec } from "../tools";
 import { getKeepAliveBackup } from "../components/keep-alive";
 import type { TreeValue, CompTree, NodeTree } from "../types";
 
@@ -190,11 +190,15 @@ export class JsxToNodes {
 
     // 卸载子组件
     if (isTree(oldTree)) {
-      customForEach(oldTree.children, childTree => {
-        if (isTree(childTree) && isCompTree(childTree)) {
-          this.destroyComp(childTree);
-        }
-      })
+      if (isCompTree(oldTree)) {  // 高阶组件
+        this.destroyComp(oldTree);
+      } else {
+        customForEach(oldTree.children, childTree => {
+          if (isTree(childTree) && isCompTree(childTree)) {
+            this.destroyComp(childTree);
+          }
+        })
+      }
     }
 
     this.option.unmount?.(tree, nodes);
