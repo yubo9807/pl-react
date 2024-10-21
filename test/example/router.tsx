@@ -4,7 +4,7 @@ import { createRouter, Router, Route, useRouter, Link, Helmet } from "~/core/rou
 function App() {
   const [child, setChild] = useState();
 
-  const router = useMemo(() => {
+  useMemo(() => {
     return createRouter({
       fristUrl: location.href.replace(location.origin, ''),
       routes: [
@@ -17,6 +17,8 @@ function App() {
       },
     });
   }, [])
+
+  const router = useRouter();
 
   return <div className='111'>
     <nav>
@@ -45,7 +47,7 @@ function App2() {
       }}>404</Link>
     </nav>
 
-    <Router base="/admin" loading={<div>loading</div>}>
+    <Router prefix="/admin" loading={<div>loading</div>}>
       <Route path='/home' element={Home} exact={false} />
       <Route path='/about' element={About} />
       <Route path={/./} element={() => <h1>404</h1>} />
@@ -70,7 +72,7 @@ function Home(props) {
       &nbsp;
     </nav>
     {/* <div> */}
-      <Router base="/admin/home">
+      <Router prefix="/admin/home">
         <Route path='/about' element={About} />
       </Router>
     {/* </div> */}

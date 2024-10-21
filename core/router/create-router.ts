@@ -14,14 +14,11 @@ export function queryRoute(routes: RouteItem[], pathname: string) {
   }
 }
 
-type RouterChangeFunc = (to: RouteConfig, from: RouteConfig) => void;
-const routerChangeFuncs: RouterChangeFunc[] = [];
-
 type Option = {
   fristUrl:    string
   routes:      RouteItem[]
   controls:    (route?: RouteItem) => void
-  base?:       string
+  prefix?:     string
   mode?:       'hash' | 'history'
   beforeEach?: BeforeEach
 }
@@ -29,48 +26,50 @@ type Option = {
 class Router {
   option: Option
   constructor(option: Option) {
-    option.base ??= '';
+    option.prefix ??= '';
     const { beforeEach, ...rest } = option;
     beforeEach && (this.beforeEach = beforeEach);
     this.option = rest;
-    this._jump(option.fristUrl, () => {});
-  }
-
-  beforeEach = (from: RouteConfig, to: RouteConfig, next: Function) => next();
-
-  currentRoute: RouteConfig
-
-  _jump(to: BaseRoute | string, callback: (url: string) => void) {
-    if (isString(to)) {
-      to = parseUrl(to);
-    }
-
-    const { base, routes, controls } = this.option;
-
-    const href = stringifyUrl(to);
-    const from = { ...this.currentRoute };
-    if (isEquals(to, from)) return;
-
-    this.beforeEach(to, from, () => {
-      const query = queryRoute(routes, href.replace(base, ''));
-      controls(query);
-      callback(href);
-      this.currentRoute = to as RouteConfig;
+    this.change(option.fristUrl).then((res: any) => {
       customForEach(routerChangeFuncs, func => {
-        func(to as RouteConfig, from);
+        func(res.to, res.from);
       })
-    });
-  }
-
-  push = (option: RouteConfig | string) => {
-    this._jump(option, (href) => {
-      history.pushState(isString(option) ? {} : option.meta, null, href);
     })
   }
 
-  replace = (option: RouteConfig | string) => {
-    this._jump(option, (href) => {
-      history.replaceState(isString(option) ? {} : option.meta, null, href);
+  beforeEach: BeforeEach = (to, from, next) => next();
+
+  currentRoute: BaseRoute
+
+  change(to: BaseRoute | string) {
+    return new Promise(resolve => {
+      if (isString(to)) {
+        to = parseUrl(to);
+      }
+
+      const { prefix, routes, controls } = this.option;
+
+      const href = stringifyUrl(to);
+      const from = { ...this.currentRoute };
+      if (isEquals(to, from)) return;
+
+      this.beforeEach(to, from, () => {
+        this.currentRoute = to as BaseRoute;
+        const query = queryRoute(routes, href.replace(prefix, ''));
+
+        function finish() {
+          controls(query);
+          resolve({ to, from });
+        }
+
+        if (query && query.beforeEach) {
+          query.beforeEach(to as BaseRoute, from, () => {
+            finish();
+          })
+        } else {
+          finish();
+        }
+      });
     })
   }
 
@@ -89,20 +88,33 @@ export function createRouter(option: Option) {
   return router;
 }
 
-function common(callback: (router: Router) => void) {
+
+type RouterChangeFunc = (to: RouteConfig, from: RouteConfig) => void;
+const routerChangeFuncs: RouterChangeFunc[] = [];
+
+async function jump(to: RouteConfig | string, type: 'push' | 'replace') {
+  let target
   for (const router of collect.values()) {
-    callback(router);
+    const res = await router.change(to);
+    target = res;
   }
+  customForEach(routerChangeFuncs, func => {
+    func(target.to, target.from);
+  })
+
+  const fullPath = target.to.fullPath;
+  history[type + 'State'](isString(to) ? {} : to.meta, null, fullPath);
 }
 
 export function useRouter(watch?: RouterChangeFunc) {
   watch && routerChangeFuncs.push(watch);
+
   return {
     push(to: RouteConfig | string) {
-      common(router => router.push(to));
+      jump(to, 'push');
     },
     replace(to: RouteConfig | string) {
-      common(router => router.replace(to));
+      jump(to, 'replace');
     },
   }
 }

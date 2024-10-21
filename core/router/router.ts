@@ -10,7 +10,7 @@ import type { BeforeEach, RouteItem } from "./type";
 import { parseUrl } from './utils';
 
 type Props = {
-  base?:       string
+  prefix?:     string
   children?:   CompTree[]
   loading?:    Component | TreeValue
   beforeEach?: BeforeEach
@@ -27,8 +27,8 @@ function getRouteKey(path: string | RegExp, url: string) {
 }
 
 export function BrowserRouter(props: Props) {
-  props.base ??= '';
-  const { base, loading, beforeEach } = props;
+  props.prefix ??= '';
+  const { prefix, loading, beforeEach } = props;
   const routes = useRoutes(props);
 
   const [child, setChild] = useState(null);
@@ -38,7 +38,7 @@ export function BrowserRouter(props: Props) {
 
     const { path, element, meta } = route;
     const key = getRouteKey(path, url);
-    const attrs: AnyObj = { path: base + key, meta }
+    const attrs: AnyObj = { path: prefix + key, meta }
     const tree = { tag: element, attrs }
 
     if (isPromise(element)) {
@@ -70,7 +70,7 @@ export function BrowserRouter(props: Props) {
     const fristUrl = location.pathname;
     return createRouter({
       fristUrl,
-      base,
+      prefix,
       routes,
       beforeEach,
       controls(route) {
@@ -83,7 +83,7 @@ export function BrowserRouter(props: Props) {
   useEffect(() => {
     function popstate(e: Event) {
       const { origin, href } = location;
-      const url = href.replace(origin + base, '');
+      const url = href.replace(origin + prefix, '');
       const route = queryRoute(routes, url);
       changeComp(route, url);
     }
@@ -101,8 +101,8 @@ export function BrowserRouter(props: Props) {
 
 let count = 0;
 export function StaticRouter(props: Props) {
-  props.base ??= '';
-  const { base, beforeEach } = props;
+  props.prefix ??= '';
+  const { prefix, beforeEach } = props;
 
   const routes = useRoutes(props);
 
@@ -121,7 +121,7 @@ export function StaticRouter(props: Props) {
     const fristUrl = parseUrl(temp.url).path;
     return createRouter({
       fristUrl,
-      base,
+      prefix,
       routes,
       beforeEach,
       async controls(route) {
@@ -129,7 +129,7 @@ export function StaticRouter(props: Props) {
 
         const { path, element, meta } = route;
         const key = getRouteKey(path, fristUrl);
-        const attrs: AnyObj = { path: base + key, meta }
+        const attrs: AnyObj = { path: prefix + key, meta }
         const tree = { tag: element, attrs } as Tree
 
         if (isPromise(element)) {
