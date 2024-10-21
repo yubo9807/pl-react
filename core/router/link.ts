@@ -1,6 +1,6 @@
 import { isObject } from "../utils"
 import { h } from "../tools"
-import { useRouter } from "./create-router"
+import { config, useRouter } from "./create-router"
 import { stringifyUrl } from "./utils"
 import type { RouteConfig } from "./type"
 import type { StyleObject } from "../types"
@@ -51,7 +51,7 @@ export function Link(props: LinkProps) {
   return h('a', {
     ...args,
     className: classList,
-    href: props.to,
+    href: config.base + props.to,
     onclick,
   }, ...children);
 }

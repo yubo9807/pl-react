@@ -1,8 +1,9 @@
 import { renderToString } from "../server";
 import type { TreeValue } from "../types";
+import { config } from "./create-router";
 
 export let temp = {
-  url: '',
+  url:  '',
   html: '',
   text: '',
   data: {},
@@ -16,7 +17,7 @@ export function ssrOutlet(url: string, tree: TreeValue, html: string, replaceTex
     temp.text = renderToString(tree);
     temp.done = result => {
       let template = temp.html;
-      const dataStr = `<script>window.g_initialProps = ${JSON.stringify(temp.data)}</script>\n`
+      const dataStr = `<script>window.${config.ssrDataKey} = ${JSON.stringify(temp.data)}</script>\n`
       const index = template.search('</body>');
       template = template.slice(0, index) + dataStr + template.slice(index);
       const html = template.replace(replaceText, result);

@@ -2,8 +2,8 @@ import { h, Fragment } from '../tools';
 import { useState, useMemo, useEffect } from "..";
 import { renderToString } from "../server";
 import { AnyObj, isClient, isFunction, isObject, isPromise, isString, nextTick } from "../utils";
-import { createId } from "../utils/string";
-import { collect, createRouter, queryRoute } from "./create-router";
+import { createId } from "../utils";
+import { collect, config, createRouter, queryRoute } from "./create-router";
 import { temp } from "./ssr-outlet";
 import type { Component, CompTree, Tree, TreeValue } from "../types";
 import type { BeforeEach, RouteItem } from "./type";
@@ -49,11 +49,11 @@ export function BrowserRouter(props: Props) {
 
     if (isFunction(getInitialProps)) {
       // @ts-ignore
-      const { g_initialProps } = window;
-      if (isObject(g_initialProps) && g_initialProps.hasOwnProperty(key)) {
-        attrs.data = g_initialProps[key];
+      const initialProps = window[config.ssrDataKey];
+      if (isObject(initialProps) && initialProps.hasOwnProperty(key)) {
+        attrs.data = initialProps[key];
         setChild(tree);
-        delete g_initialProps[key];
+        delete initialProps[key];
       } else {
         loading && setChild(loading);  // 组件无法直接渲染，先渲染loading
         getInitialProps().then(res => {

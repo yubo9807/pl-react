@@ -1,7 +1,19 @@
-import { customForEach, isClient, isEquals, isRegExp, isString } from "../utils"
+import { customForEach, ExcludeKey, isClient, isEquals, isRegExp, isString } from "../utils"
 import { temp } from "./ssr-outlet";
 import { BaseRoute, BeforeEach, RouteConfig, RouteItem } from "./type"
 import { parseUrl, stringifyUrl } from "./utils"
+
+export const config = {
+  base:       '',
+  ssrDataKey: 'g_initialProps',
+}
+/**
+ * 初始化路由配置
+ * @param option 
+ */
+export function initRouter(option: Partial<typeof config>) {
+  Object.assign(config, option);
+}
 
 export function queryRoute(routes: RouteItem[], pathname: string) {
   for (const route of routes) {
@@ -19,27 +31,27 @@ type Option = {
   routes:      RouteItem[]
   controls:    (route?: RouteItem) => void
   prefix?:     string
-  mode?:       'hash' | 'history'
   beforeEach?: BeforeEach
 }
 
 class Router {
-  option: Option
+  option:       ExcludeKey<Option, 'fristUrl'>
+  beforeEach:   BeforeEach
+  currentRoute: BaseRoute
+
   constructor(option: Option) {
     option.prefix ??= '';
-    const { beforeEach, ...rest } = option;
-    beforeEach && (this.beforeEach = beforeEach);
-    this.option = rest;
-    this.change(option.fristUrl).then((res: any) => {
+    const { beforeEach, fristUrl, ...args } = option;
+    this.beforeEach = beforeEach || ((to, from, next) => next());
+    this.option = args;
+    const base = config.base;
+    if (!fristUrl.startsWith(base)) return;
+    this.change(fristUrl.replace(base, '')).then((res: any) => {
       customForEach(routerChangeFuncs, func => {
         func(res.to, res.from);
       })
     })
-  }
-
-  beforeEach: BeforeEach = (to, from, next) => next();
-
-  currentRoute: BaseRoute
+  }  
 
   change(to: BaseRoute | string) {
     return new Promise(resolve => {
@@ -102,8 +114,8 @@ async function jump(to: RouteConfig | string, type: 'push' | 'replace') {
     func(target.to, target.from);
   })
 
-  const fullPath = target.to.fullPath;
-  history[type + 'State'](isString(to) ? {} : to.meta, null, fullPath);
+  const url = config.base + target.to.fullPath;
+  history[type + 'State'](isString(to) ? {} : to.meta, null, url);
 }
 
 export function useRouter(watch?: RouterChangeFunc) {

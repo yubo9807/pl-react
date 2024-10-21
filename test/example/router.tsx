@@ -1,5 +1,5 @@
 import { Fragment, h, useMemo, useState } from "~/core"
-import { createRouter, Router, Route, useRouter, Link, Helmet } from "~/core/router";
+import { createRouter, Router, Route, useRouter, Link, Helmet, initRouter } from "~/core/router";
 
 function App() {
   const [child, setChild] = useState();
@@ -33,21 +33,23 @@ function App() {
 }
 
 
+initRouter({ base: '/admin' })
+
 function App2() {
   const router = useRouter();
   return <div>
     <nav>
-      <Link to='/admin/home'>home</Link>
+      <Link to='/home'>home</Link>
       &nbsp;
-      <Link to='/admin/about'>about</Link>
+      <Link to='/about'>about</Link>
       &nbsp;
       <Link to='/123' onClick={(to, next) => {
         console.log(to);
-        next('/admin/404');
+        next('/404');
       }}>404</Link>
     </nav>
 
-    <Router prefix="/admin" loading={<div>loading</div>}>
+    <Router loading={<div>loading</div>}>
       <Route path='/home' element={Home} exact={false} />
       <Route path='/about' element={About} />
       <Route path={/./} element={() => <h1>404</h1>} />
@@ -66,13 +68,13 @@ function Home(props) {
     <button onclick={() => setCount(count + 1)}>{count}</button>
 
     <nav>
-      <Link to='/admin/home'>home</Link>
+      <Link to='/home'>home</Link>
       &nbsp;
-      <Link to='/admin/home/about'>about</Link>
+      <Link to='/home/about'>about</Link>
       &nbsp;
     </nav>
     {/* <div> */}
-      <Router prefix="/admin/home">
+      <Router prefix="/home">
         <Route path='/about' element={About} />
       </Router>
     {/* </div> */}
