@@ -1,7 +1,7 @@
 import { isEquals } from "../utils"
 import { BasicHook, Instance, useInstanceTips } from "./utils"
 
-type EffectFunc = () => (Function | void)
+type EffectFunc = () => (Function | void | Promise<Function | void>)
 type EffectDeps = any[]
 type EffectItem = {
   func:    EffectFunc
@@ -43,7 +43,7 @@ export class Effect extends BasicHook<EffectItem> {
     const map = this.dataMap.get(instance);
     if (!map) return;
 
-    map.forEach(item => {
+    map.forEach(async item => {
       const { clear, func, deps, oldDeps } = item;
 
       // 对比数据变化
@@ -52,7 +52,8 @@ export class Effect extends BasicHook<EffectItem> {
       // 执行上一次的函数清理
       clear && clear();
 
-      item.clear = func();
+      const reslut = await func();
+      item.clear = reslut;
       item.oldDeps = deps;
     })
   }

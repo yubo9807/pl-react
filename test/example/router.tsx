@@ -1,5 +1,5 @@
 import { Fragment, h, useMemo, useState } from "~/core"
-import { createRouter, Router, Route, useRouter, Link, Helmet, initRouter } from "~/core/router";
+import { createRouter, Router, Route, useRouter, Link, Helmet } from "~/core/router";
 
 function App() {
   const [child, setChild] = useState();
@@ -32,8 +32,6 @@ function App() {
   </div>
 }
 
-
-initRouter({ base: '/admin' })
 
 function App2() {
   const router = useRouter();

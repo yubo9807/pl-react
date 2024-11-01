@@ -68,7 +68,7 @@ export function isClass(func: Function): func is WideClass {
  * @param result 
  * @returns 
  */
-export function isPromise(result: any): boolean {
+export function isPromise(result: any): result is Promise<any> {
   return typeof result === 'object' && result[Symbol.toStringTag] === 'Promise';
 }
 
