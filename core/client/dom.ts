@@ -1,5 +1,5 @@
 import { joinClass } from "../tools";
-import { AnyObj, customForEach, isArray, isObject } from "../utils";
+import { customForEach, isArray, isObject } from "../utils";
 
 export type WithNode = HTMLElement
 

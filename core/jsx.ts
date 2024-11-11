@@ -6,7 +6,7 @@ type HTMLAttributes<T extends AnyObj> = {
   [K in keyof ExcludeKey<T, 'className' | 'style'>]?: T[K]
 } & {
   className?: string | string[]
-  style?:     StyleObject
+  style?:     string | StyleObject
   ref?:       RefItem<unknown>
 }
 

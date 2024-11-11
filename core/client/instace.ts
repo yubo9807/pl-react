@@ -1,7 +1,8 @@
 import { AnyObj, customForEach, isString, len, nextTick } from "../utils";
 import { JsxToNodes } from "./jsx-node";
 import { initHooks, isTree } from "../tools";
-import type { Component, CompTree, Tree } from "../types";
+import type { Component, CompTree, NodeTree, Tree } from "../types";
+import { RefItem } from "../hooks";
 // import { clearCompTree, collectChildTree } from "./tree";
 
 export let currentApp: ReturnType<typeof createApp>;
@@ -11,6 +12,12 @@ export function createApp() {
   const globalCompMap = new Map<string, Component>();
   function useComponent(name: string, comp: Component) {
     globalCompMap.set(name, comp);
+  }
+
+  type Directive = (value: any, el: HTMLElement) => void
+  const globalDirectives: Record<string, Directive> = {};
+  function useDirective(name: string, directive: Directive) {
+    globalDirectives[name] = directive;
   }
 
   const hooks = initHooks(stateUpdate);
@@ -87,12 +94,27 @@ export function createApp() {
     },
 
     nodeMount(tree, node) {
-      const { ref } = tree.attrs as AnyObj;
+      const { ref, ...args } = tree.attrs;
       if (ref) {
         ref.current = node;
       }
+      handleDirective(args, node);
+    },
+
+    nodeUpdate(tree, oldTree, node) {
+      nextTick(() => {
+        const { ref, ...args } = tree.attrs;
+        handleDirective(args, node);
+      })
     },
   });
+
+  function handleDirective(attrs: NodeTree['attrs'], node: HTMLElement) {
+    for (const attr in attrs) {
+      const func = globalDirectives[attr];
+      func && func(attrs[attr], node);
+    }
+  }
 
   function convert(tree: Tree) {
     return structure.render(tree);
@@ -102,6 +124,7 @@ export function createApp() {
   const instance = {
     ...hooks,
     useComponent,
+    useDirective,
     convert,
     /**
      * 渲染组件，并挂载到父节点上

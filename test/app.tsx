@@ -7,5 +7,6 @@ import keepAlive from './example/keep-alive';
 import store from './example/store';
 import router from './example/router';
 import instance from './example/instance';
+import directive from './example/directive';
 
-export default store
+export default directive;

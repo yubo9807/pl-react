@@ -54,6 +54,15 @@ type Option = {
    * @param node 
    */
   nodeMount?: (tree: NodeTree, node: HTMLElement) => void
+
+  /**
+   * 节点元素更新
+   * @param tree 
+   * @param oldTree 
+   * @param node 
+   * @returns 
+   */
+  nodeUpdate?: (tree: NodeTree, oldTree: NodeTree, node: HTMLElement) => void
 }
 
 
@@ -275,8 +284,11 @@ export class JsxToNodes {
 
       // 普通节点
       if (isString(newTree.tag)) {
-        const attrs = diffObject(newTree.attrs, oldTree.attrs);
         const node = nodes[0];
+        const { nodeUpdate } = self.option;
+        nodeUpdate && nodeUpdate(newTree as NodeTree, oldTree as NodeTree, node);
+
+        const attrs = diffObject(newTree.attrs, oldTree.attrs);
         customForEach(attrs, val => {
           const { type, key } = val;
           let value = val.newValue;
