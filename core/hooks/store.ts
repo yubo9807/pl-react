@@ -1,5 +1,5 @@
 import { Reducer, ReducerAction, ReducerHandle } from "./reducer";
-import { getCurrnetInstance } from "..";
+import { getHooks } from "..";
 import { BasicHook, useInstanceTips } from "./utils";
 import type { CompTree } from "../types";
 
@@ -14,7 +14,7 @@ export function defineStore<S, A extends ReducerAction>(
 
   function update() {
     map.get(key).forEach(tree => {
-      getCurrnetInstance().refresh(tree);
+      getHooks().compUpdate(tree);
     })
   }
 

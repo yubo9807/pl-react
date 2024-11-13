@@ -21,12 +21,8 @@ const builds = [
     external: ['../utils', '../tools'],
   },
   {
-    file: 'server/index',
-    external: ['../utils', '../tools'],
-  },
-  {
     file: 'index',
-    external: ['./utils', './hooks', './tools', './client', './server'],
+    external: ['./utils', './hooks', './tools', './client'],
   },
   {
     file: 'components/index',

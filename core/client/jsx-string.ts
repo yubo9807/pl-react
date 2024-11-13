@@ -1,7 +1,6 @@
 import { compExec, isFragment, isTree, joinClass } from "../tools";
 import { CompTree, NodeTree, TreeValue } from "../types";
 import { customForEach, isObject, isString } from "../utils";
-export { h, Fragment } from "../tools";
 
 type Option = {
   /**
@@ -18,31 +17,35 @@ type Option = {
   currentCompTree?: (tree: CompTree) => void
 
 }
-export class JsxToString {
+export function jsxToString(tree: TreeValue, option: Option = {}) {
 
-  option: Option
-  constructor(option: Option = {}) {
-    this.option = option;
-  }
+  const { intercept, currentCompTree } = option;
 
-  render(tree: TreeValue) {
+  function render(tree: TreeValue) {
+    intercept?.(tree);
+
     if (!isTree(tree)) {
       return tree;
     }
   
     const { tag } = tree;
     if (isString(tag)) {
-      return this.toReal(tree as NodeTree);
+      return toReal(tree as NodeTree);
     }
   
     if (isFragment(tag)) {
-      return this.toFragment(tree.children);
+      return toFragment(tree.children);
     }
   
-    return this.createComp(tree as CompTree);
+    return createComp(tree as CompTree);
   }
 
-  toReal(tree: NodeTree) {
+  /**
+   * 单节点
+   * @param tree 
+   * @returns 
+   */
+  function toReal(tree: NodeTree) {
     const { tag, attrs, children } = tree;
     let attrStr = '';
   
@@ -68,21 +71,33 @@ export class JsxToString {
       attrStr += ` ${attr}="${value}"`;
     }
   
-    return `<${tag}${attrStr}>${this.toFragment(children)}</${tag}>`;
+    return `<${tag}${attrStr}>${toFragment(children)}</${tag}>`;
   }
 
-  toFragment(children: TreeValue[]) {
+
+  /**
+   * 节点片段
+   * @param children 
+   * @returns 
+   */
+  function toFragment(children: TreeValue[]) {
     let text = '';
     customForEach(children, tree => {
-      text += this.render(tree);
+      text += render(tree);
     })
     return text;
   }
 
-  createComp(tree: CompTree) {
-    const { currentCompTree } = this.option;
+
+  /**
+   * 组件
+   * @param tree 
+   * @returns 
+   */
+  function createComp(tree: CompTree) {
     currentCompTree?.(tree);
-  
-    return this.render(compExec(tree));
+    return render(compExec(tree));
   }
+
+  return render(tree);
 }

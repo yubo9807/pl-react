@@ -1,23 +1,25 @@
-import { AnyObj, customForEach, isString, len, nextTick } from "../utils";
+import { customForEach, isString, len, nextTick } from "../utils";
 import { JsxToNodes } from "./jsx-node";
 import { initHooks, isTree } from "../tools";
-import type { Component, CompTree, NodeTree, Tree } from "../types";
-import { RefItem } from "../hooks";
+import type { Component, CompTree, NodeTree, Tree, TreeValue } from "../types";
+import { jsxToString } from "./jsx-string";
 // import { clearCompTree, collectChildTree } from "./tree";
 
-export let currentApp: ReturnType<typeof createApp>;
+let currentApp: ReturnType<typeof createApp>;
 
 export function createApp() {
 
-  const globalCompMap = new Map<string, Component>();
+  // 全局组件
+  const globalComp: Record<string, Component> = {};
   function useComponent(name: string, comp: Component) {
-    globalCompMap.set(name, comp);
+    globalComp[name] = comp;
   }
 
   type Directive = (value: any, el: HTMLElement) => void
-  const globalDirectives: Record<string, Directive> = {};
+  // 全局指令
+  const globalDirective: Record<string, Directive> = {};
   function useDirective(name: string, directive: Directive) {
-    globalDirectives[name] = directive;
+    globalDirective[name] = directive;
   }
 
   const hooks = initHooks(stateUpdate);
@@ -50,7 +52,7 @@ export function createApp() {
       const { tag } = tree;
       if (isString(tag)) {
         // 全局组件
-        const comp = globalCompMap.get(tag);
+        const comp = globalComp[tag];
         if (comp) {
           tree.tag = comp;
         }
@@ -111,7 +113,7 @@ export function createApp() {
 
   function handleDirective(attrs: NodeTree['attrs'], node: HTMLElement) {
     for (const attr in attrs) {
-      const func = globalDirectives[attr];
+      const func = globalDirective[attr];
       func && func(attrs[attr], node);
     }
   }
@@ -122,7 +124,6 @@ export function createApp() {
 
   let rootTree: CompTree
   const instance = {
-    ...hooks,
     useComponent,
     useDirective,
     convert,
@@ -138,33 +139,74 @@ export function createApp() {
       return nodes;
     },
     /**
-     * 强制更新组件
-     * @param tree 
-     * @returns 
-     */
-    refresh(tree: CompTree) {
-      return stateUpdate(tree);
-    },
-    /**
      * 卸载应用
      */
     unmount() {
       structure.destroyComp(rootTree);
     },
     /**
+     * 转为字符串
+     * @param tree 
+     * @returns 
+     */
+    renderToString(tree: TreeValue) {
+      return jsxToString(tree, {
+        intercept(tree) {
+          if (!isTree(tree)) return;
+          const { tag, attrs } = tree;
+          if (isString(tag)) {
+            const comp = globalComp[tag];
+            if (comp) return tree.tag = comp;
+  
+            for (const attr in attrs) {
+              const directive = globalDirective[attr];
+              directive && delete attrs[attr];
+            }
+          }
+        },
+        currentCompTree(tree) {
+          customForEach(hooksValues, hook => {
+            hook.setInstance(tree);
+          })
+        },
+      });
+    },
+    /**
+     * 插件绑定
+     * @param plugin 
+     * @returns 
+     */
+    use(plugin: { install: (instance) => void }) {
+      plugin.install(instance);
+      return instance;
+    },
+    /**
+     * 强制更新组件
+     * @param tree 
+     * @returns 
+     */
+    compUpdate(tree: CompTree) {
+      return stateUpdate(tree);
+    },
+    /**
      * 获取组件树结果
      * @param tree 
      * @returns 
      */
-    getCompResult(tree: CompTree) {
+    compResult(tree: CompTree) {
       return structure.treeMap.get(tree);
     },
-    use(plugin: { install: (instance) => void }) {
-      plugin.install(instance);
-      return instance;
-    }
   }
+  Object.setPrototypeOf(instance, hooks);
 
   currentApp = instance;
   return instance;
+}
+
+/**
+ * 获取当前实例
+ * @returns 
+ */
+export function getCurrnetInstance() {
+  return currentApp;
 }

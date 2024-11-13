@@ -1,7 +1,6 @@
-import { getCurrnetInstance, useEffect, useMemo } from "..";
+import { getHooks, useEffect, useMemo } from "..";
 import { Fragment, h } from "../tools";
-import { nodes_replaceWith } from "../client";
-import { renderToString } from "../server";
+import { getCurrnetInstance, nodes_replaceWith } from "../client";
 import { customForEach, isClient } from "../utils";
 import { temp } from "./ssr-outlet";
 import type { Tree } from "../types"
@@ -12,7 +11,7 @@ function helmet(config: { [k: string]: Tree }) {
 
   const client = isClient();
   if (client) {
-    const { convert } = getCurrnetInstance();
+    const { convert } = getHooks();
     const childNodes = [...document.head.childNodes];
     for (const key in config) {
       const query = childNodes.find(val => val.nodeType === 8 && val.nodeValue.trim() === key) as HTMLElement;
@@ -26,7 +25,8 @@ function helmet(config: { [k: string]: Tree }) {
   } else {
     for (const key in config) {
       const tree = config[key];
-      const str = renderToString(tree);
+      const app = getCurrnetInstance();
+      const str = app.renderToString(tree);
       temp.html = temp.html.replace(`<!-- ${key} -->`, str);
     }
   }

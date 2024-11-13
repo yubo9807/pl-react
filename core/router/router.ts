@@ -1,6 +1,5 @@
 import { h, Fragment } from '../tools';
 import { useState, useMemo, useEffect } from "..";
-import { renderToString } from "../server";
 import { AnyObj, isClient, isFunction, isObject, isPromise, isString, nextTick } from "../utils";
 import { createId } from "../utils";
 import { collect, config, createRouter, queryRoute } from "./create-router";
@@ -8,6 +7,7 @@ import { temp } from "./ssr-outlet";
 import type { Component, CompTree, Tree, TreeValue } from "../types";
 import type { BeforeEach, RouteItem } from "./type";
 import { parseUrl } from './utils';
+import { getCurrnetInstance } from '../client';
 
 type Props = {
   prefix?:     string
@@ -99,25 +99,26 @@ export function BrowserRouter(props: Props) {
   return h(Fragment, {}, child);
 }
 
-let count = 0;
 export function StaticRouter(props: Props) {
   props.prefix ??= '';
   const { prefix, beforeEach } = props;
 
   const routes = useRoutes(props);
 
+  const app = getCurrnetInstance();
   const [child] = useState('r_' + createId());
 
   function replaceStr(tree: TreeValue) {
-    count --;
+    temp.count --;
     nextTick(() => {
-      const result = temp.text.replace(child, renderToString(tree));
-      count === 0 && temp.done(result);
+      const result = temp.text.replace(child, app.renderToString(tree));
+      temp.count === 0 && temp.done(result);
     })
   }
 
   const router = useMemo(() => {
-    count ++;
+    temp.count ??= 0;
+    temp.count ++;
     const fristUrl = parseUrl(temp.url).path;
     return createRouter({
       fristUrl,

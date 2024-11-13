@@ -1,4 +1,5 @@
 import { createServer } from 'http';
+import app from './basic';
 import App from './app';
 import { ssrOutlet } from "~/core/router";
 import { h } from "~/core/tools";
@@ -71,7 +72,7 @@ const server = createServer(async (req, res) => {
     });
   } else {
     // 服务端渲染
-    ssrOutlet(url, h(App), html).then(content => {
+    ssrOutlet(url, app, h(App), html).then(content => {
       res.write(content);
       res.end();
     })
