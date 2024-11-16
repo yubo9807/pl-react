@@ -1,6 +1,7 @@
 import { AnyObj, customForEach, throwError } from "../utils";
 import { h, Fragment } from "../tools";
-import { getHooks, useEffect, useLayoutEffect } from "..";
+import { getCurrnetInstance } from "../client";
+import { useEffect, useLayoutEffect } from "..";
 import type { CompTree } from "../types";
 
 /**
@@ -31,7 +32,7 @@ export function createContext<T extends AnyObj>(initial = {} as T) {
       lock = true;        // 开始搜集子组件
       treeSet.forEach(tree => {
         // 强制更新用到 context 数据的子组件
-        getHooks().compUpdate(tree);
+        getCurrnetInstance().compUpdate(tree);
       })
     })
     useLayoutEffect(() => {

@@ -5,7 +5,7 @@ import type { Component, CompTree, NodeTree, Tree, TreeValue } from "../types";
 import { jsxToString } from "./jsx-string";
 // import { clearCompTree, collectChildTree } from "./tree";
 
-let currentApp: ReturnType<typeof createApp>;
+let currentApp: ReturnType<typeof createApp>
 
 export function createApp() {
 
@@ -60,7 +60,7 @@ export function createApp() {
     },
 
     currentCompTree(tree) {
-      currentApp = instance;
+      currentApp = instance;  // 保证在使用 hook 时，能正确的获取到当前实例
       customForEach(hooksValues, hook => {
         hook.setInstance(tree);
       })
@@ -157,7 +157,7 @@ export function createApp() {
           if (isString(tag)) {
             const comp = globalComp[tag];
             if (comp) return tree.tag = comp;
-  
+
             for (const attr in attrs) {
               const directive = globalDirective[attr];
               directive && delete attrs[attr];

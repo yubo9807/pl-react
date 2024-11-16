@@ -4,12 +4,13 @@ import type { Callback, Context, Effect, Expose, Memo, Reducer, Ref, State, Stor
 export { Fragment, h } from './tools';
 export { createApp } from './client'
 export { defineStore } from './hooks';
+export { getCurrnetInstance };
 
 /**
  * 获取当前实例
  * @returns 
  */
-export function getHooks(): any {
+function getHooks(): any {
   return getCurrnetInstance();
 }
 

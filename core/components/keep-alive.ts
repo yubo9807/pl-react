@@ -1,6 +1,7 @@
 import { customForEach } from "../utils"
 import { h, Fragment, isCompTree, isTree } from "../tools";
-import { getHooks, useLayoutEffect, useMemo } from '..'
+import { getCurrnetInstance } from "../client";
+import { useLayoutEffect, useMemo } from '..'
 import type { CompTree, Tree, TreeValue } from "../types"
 
 type Key = string | Function
@@ -43,7 +44,7 @@ export function KeepAlive(props: Props) {
     customForEach(children, tree => {
       if (!(isTree(tree) && isCompTree(tree))) return;
 
-      const result = getHooks().compResult(tree);
+      const result = getCurrnetInstance().compResult(tree);
       const { attrs, tag } = tree;
       const key = attrs.key || tag;
       if (exclude && exclude.includes(key)) return;

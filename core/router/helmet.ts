@@ -1,4 +1,4 @@
-import { getHooks, useEffect, useMemo } from "..";
+import { useEffect, useMemo } from "..";
 import { Fragment, h } from "../tools";
 import { getCurrnetInstance, nodes_replaceWith } from "../client";
 import { customForEach, isClient } from "../utils";
@@ -11,7 +11,7 @@ function helmet(config: { [k: string]: Tree }) {
 
   const client = isClient();
   if (client) {
-    const { convert } = getHooks();
+    const { convert } = getCurrnetInstance();
     const childNodes = [...document.head.childNodes];
     for (const key in config) {
       const query = childNodes.find(val => val.nodeType === 8 && val.nodeValue.trim() === key) as HTMLElement;
