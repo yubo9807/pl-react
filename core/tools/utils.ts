@@ -36,10 +36,10 @@ export function compExec(tree: CompTree): TreeValue {
 }
 
 export enum DiffType {
-  create  = 'create',
-  remove  = 'remove',
-  update  = 'update',
-	reserve = 'reserve',
+  create  = 1,
+  update  = 2,
+	reserve = 3,
+  remove  = 4,
 }
 type DiffObjectReturn = {
   key:      string
@@ -47,12 +47,14 @@ type DiffObjectReturn = {
   newValue: any
   oldValue: any
 }[]
-export function diffObject(obj1: object, obj2: object): DiffObjectReturn {
+export function diffObject(newObj: object, oldObj: object): DiffObjectReturn {
   const collect = [];
-  const keys1 = Object.keys(obj1), keys2 = Object.keys(obj2);
+  const getKeys = (o: object) => Object.keys(o);
+  const keys1 = getKeys(newObj), keys2 = getKeys(oldObj);
 
   for (const k of keys1) {
-    const item = { key: k, newValue: obj1[k], oldValue: obj2[k] }
+    const val1 = newObj[k], val2 = oldObj[k];
+    const item = { key: k, newValue: val1, oldValue: val2 }
     // 旧对象中不存在，新增
     if (!keys2.includes(k)) {
       collect.push({ type: DiffType.create, ...item });
@@ -60,9 +62,9 @@ export function diffObject(obj1: object, obj2: object): DiffObjectReturn {
     }
 
     // 数据未发生变化
-    if (isObject(obj1[k]) && isObject(obj2[k])) {
-      const { node, ...args } = obj2[k];
-			const value = obj1[k];
+    if (isObject(val1) && isObject(val2)) {
+      const { node, ...args } = val2;
+			const value = val1;
       if (isEquals(value, args)) {
 				if (isTree(value) && isCompTree(value)) {
 					collect.push({ type: DiffType.reserve, ...item });
@@ -70,13 +72,13 @@ export function diffObject(obj1: object, obj2: object): DiffObjectReturn {
 				continue;
 			}
     }
-    if (isEquals(obj1[k], obj2[k])) continue;
+    if (isEquals(val1, val2)) continue;
 
     // 更新
     collect.push({ type: DiffType.update, ...item });
 
-    if (!isObject(obj1[k]) && !isFunction(obj1[k])) {
-      obj2[k] = obj1[k];
+    if (!isObject(val1) && !isFunction(val1)) {
+      oldObj[k] = val1;
     }
   }
 
@@ -84,7 +86,7 @@ export function diffObject(obj1: object, obj2: object): DiffObjectReturn {
     if (keys1.includes(k)) continue;
 
     // 新对象中没有，删除
-    collect.push({ type: DiffType.remove, key: k, newValue: obj1[k], oldValue: obj2[k] });
+    collect.push({ type: DiffType.remove, key: k, newValue: newObj[k], oldValue: oldObj[k] });
     // delete obj2[k];
   }
 

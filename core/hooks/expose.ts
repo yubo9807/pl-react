@@ -17,6 +17,7 @@ export class Expose extends BasicHook<ExposeItem> {
   use<T>(ref: RefItem<T>, handle: () => T, deps?: any[]) {
     const { instance, dataMap, count } = this;
     useInstanceTips(instance);
+    if (!ref) return;  // ref 不存在，不进行计数（该钩子在组件中无效）
 
     const map = dataMap.get(instance) || new Map<number, ExposeItem>();
     const item = map.get(count);
