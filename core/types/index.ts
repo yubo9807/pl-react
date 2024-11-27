@@ -1,3 +1,5 @@
+import type { AnyObj } from "../utils"
+
 export type BaseComponent = (props: PropsType) => any
 export type ClassComponent = new (props: PropsType) => any
 export type Component = BaseComponent | ClassComponent
@@ -7,16 +9,15 @@ export type Tag = keyof HTMLElementTagNameMap | Component
 export type Children = Array<Tree | string | number>
 
 export interface PropsType {
-  // ref?:      { current: unknown }
-  children?:   Children
-  [k: string]: any
+  ref?:      { current: unknown }
+  children?: Children
 }
 
 
 
 export interface Tree {
   tag:      Tag
-  attrs:    PropsType
+  attrs:    AnyObj
   children: Children
 }
 

@@ -23,3 +23,8 @@ export type RouteItem = {
   beforeEach?: BeforeEach
   [k: string]: any
 }
+
+export type PageProps = {
+  path: string
+  data: any
+}

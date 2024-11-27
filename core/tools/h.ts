@@ -1,7 +1,7 @@
-import { isEmpty, len } from "../utils";
+import { AnyObj, isEmpty, len } from "../utils";
 import { Children, PropsType, Tag } from "../types";
 
-export function h(tag: Tag, attrs: PropsType = {}, ...children: Children) {
+export function h(tag: Tag, attrs: AnyObj = {}, ...children: Children) {
   attrs ||= {};
   const tree = {
     tag,

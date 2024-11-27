@@ -1,10 +1,9 @@
 import { isEquals } from "../utils";
 import { BasicHook, useInstanceTips } from "./utils";
 
-type CallBackFunc = Function
 type CallBackDeps = any[]
 type CallBackItem = {
-  func: CallBackFunc
+  func: Function
   deps: CallBackDeps
 }
 export class Callback extends BasicHook<CallBackItem> {
@@ -15,7 +14,7 @@ export class Callback extends BasicHook<CallBackItem> {
    * @param deps 
    * @returns 
    */
-  use(func: CallBackFunc, deps?: CallBackDeps) {
+  use<T extends Function>(func: T, deps?: CallBackDeps): T {
     const { instance, dataMap, count } = this;
     useInstanceTips(instance);
 
@@ -23,7 +22,7 @@ export class Callback extends BasicHook<CallBackItem> {
     const item = map.get(count);
 
     if (item && deps !== void 0 && isEquals(deps, item.deps)) {
-      return item.func;
+      return item.func as T;
     }
 
     map.set(count, { func, deps });
