@@ -1,5 +1,5 @@
 import { joinClass } from "../tools";
-import { customForEach, isArray, isObject } from "../utils";
+import { customForEach, isArray, isObject, len } from "../utils";
 
 export type WithNode = HTMLElement
 
@@ -20,7 +20,7 @@ export function nodes_replaceWith(newNodes: WithNode[], oldNodes: WithNode[]) {
   customForEach(newNodes, (node, i) => {
     const lastNode = newNodes[i - 1];
     lastNode.after(node);
-  }, oldNodes.length);
+  }, len(oldNodes));
 }
 
 /**

@@ -9,4 +9,4 @@ import router from './example/router';
 import instance from './example/instance';
 import directive from './example/directive';
 
-export default directive;
+export default router;

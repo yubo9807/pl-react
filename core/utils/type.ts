@@ -19,3 +19,9 @@ export type WideClass = new (...args: any[]) => AnyObj
 export type ExcludeKey<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 // type A = { a: number, b: number, c: string }
 // type B = ExcludeKey<A, 'a'>
+
+/**
+ * 得到 Promise 返回类型
+ */
+export type PromiseType<T> = T extends Promise<infer K> ? K : T
+// type Pt = PromiseType<Promise<string>>

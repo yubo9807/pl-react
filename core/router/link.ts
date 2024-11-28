@@ -2,19 +2,19 @@ import { isObject } from "../utils"
 import { h } from "../tools"
 import { config, useRouter } from "./create-router"
 import { stringifyUrl } from "./utils"
-import type { RouteConfig } from "./type"
+import type { PartialRoute } from "./type"
 import type { StyleObject } from "../types"
 import type { RefItem } from "../hooks"
-import { useState } from ".."
+import { useMemo, useState } from ".."
 
 type LinkProps = {
-  to:         RouteConfig | string
+  to:         PartialRoute | string
   type?:      'push' | 'replace'
   className?: string | string[]
   style?:     StyleObject
   ref?:       RefItem<HTMLAnchorElement>
   children?:  any[]
-  onClick?:   (to: string, next: (to?: RouteConfig | string) => void) => void
+  onClick?:   (to: string, next: (to?: PartialRoute | string) => void) => void
 } & {
   [K in keyof HTMLAnchorElement]?: HTMLAnchorElement[K]
 }
@@ -25,14 +25,14 @@ export function Link(props: LinkProps) {
   }
 
   const [classList, setClassList] = useState([]);
-  const router = useRouter(to => {
+  const router = useMemo(() => useRouter(to => {
     const routePath = props.to + '/', toPath = to.path + '/';
     setClassList([
       toPath.startsWith(routePath) ? 'active' : '',
       toPath === routePath ? 'exact-active' : '',
       ...[className].flat(),
     ]);
-  });
+  }), []);
 
   function onclick(e) {
     e.preventDefault();

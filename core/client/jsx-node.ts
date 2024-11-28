@@ -1,4 +1,4 @@
-import { customForEach, isObject, isString, isEmpty, isEquals } from "../utils";
+import { customForEach, isObject, isString, isEmpty, isEquals, len } from "../utils";
 import { attrAssign, nodes_after, nodes_remove, nodes_replaceWith, WithNode } from "./dom";
 import { isFragment, isCompTree, isTree, diffObject, DiffType, compExec } from "../tools";
 import { getKeepAliveBackup } from "../components/keep-alive";
@@ -276,7 +276,7 @@ export class JsxToNodes {
 
         customForEach(childNodes, node => {
           node.remove();
-        }, newTree.children.length);
+        }, len(newTree.children));
         self.fragmentMap.set(newTree, newChildNodes);
         self.fragmentMap.delete(oldTree);
         return newChildNodes;

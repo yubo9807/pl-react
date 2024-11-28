@@ -1,6 +1,5 @@
-import { customForEach, ExcludeKey, isClient, isEquals, isRegExp, isString } from "../utils"
-import { temp } from "./ssr-outlet";
-import { BaseRoute, BeforeEach, RouteConfig, RouteItem } from "./type"
+import { customForEach, ExcludeKey, isClient, isEquals, isRegExp, isString, PromiseType } from "../utils"
+import { BeforeEach, PartialRoute, ResultRoute, RouteItem } from "./type"
 import { parseUrl, stringifyUrl } from "./utils"
 
 export const config = {
@@ -37,7 +36,7 @@ type Option = {
 class Router {
   option:       ExcludeKey<Option, 'fristUrl'>
   beforeEach:   BeforeEach
-  currentRoute: BaseRoute
+  currentRoute: ResultRoute
 
   constructor(option: Option) {
     option.prefix ??= '';
@@ -53,21 +52,19 @@ class Router {
     })
   }  
 
-  change(to: BaseRoute | string) {
-    return new Promise(resolve => {
-      if (isString(to)) {
-        to = parseUrl(to);
-      }
+  change(target: PartialRoute | string) {
+    return new Promise<{ to: ResultRoute, from: ResultRoute }>(resolve => {
+      const targetStr = isString(target) ? target : stringifyUrl(target);
+      const to = parseUrl(targetStr);
 
       const { prefix, routes, controls } = this.option;
 
-      const href = stringifyUrl(to);
       const from = { ...this.currentRoute };
-      if (isEquals(to, from)) return;
+      if (isEquals(target, from)) return;
 
       this.beforeEach(to, from, () => {
-        this.currentRoute = to as BaseRoute;
-        const query = queryRoute(routes, href.replace(prefix, ''));
+        this.currentRoute = to;
+        const query = queryRoute(routes, to.fullPath.replace(prefix, ''));
 
         function finish() {
           controls(query);
@@ -75,7 +72,7 @@ class Router {
         }
 
         if (query && query.beforeEach) {
-          query.beforeEach(to as BaseRoute, from, () => {
+          query.beforeEach(to, from, () => {
             finish();
           })
         } else {
@@ -101,40 +98,53 @@ export function createRouter(option: Option) {
 }
 
 
-type RouterChangeFunc = (to: RouteConfig, from: RouteConfig) => void;
+type RouterChangeFunc = (to: ResultRoute, from: ResultRoute) => void;
 const routerChangeFuncs: RouterChangeFunc[] = [];
 
-async function jump(to: RouteConfig | string, type: 'push' | 'replace') {
-  let target
+// 当前路由
+let currentRoute: ResultRoute
+export function setCurrentRoute(url: string) {
+  currentRoute = parseUrl(url.replace(config.base, ''));
+}
+isClient() && setCurrentRoute(location.href.replace(location.origin, ''));
+
+export function useRoute() {
+  return currentRoute;
+}
+
+/**
+ * 路由跳转
+ * @param to 
+ * @param type 
+ */
+async function jump(to: PartialRoute | string, type: 'push' | 'replace') {
+  let target: PromiseType<ReturnType<Router['change']>>
   for (const router of collect.values()) {
     const res = await router.change(to);
     target = res;
   }
+
+  // 当前路由
+  currentRoute = target.to;
+
+  // 执行注册的监听路由方法
   customForEach(routerChangeFuncs, func => {
     func(target.to, target.from);
   })
 
   const url = config.base + target.to.fullPath;
-  history[type + 'State'](isString(to) ? {} : to.meta, null, url);
+  isClient() && history[type + 'State'](isString(to) ? {} : to.meta, null, url);
 }
 
 export function useRouter(watch?: RouterChangeFunc) {
   watch && routerChangeFuncs.push(watch);
 
   return {
-    push(to: RouteConfig | string) {
+    push(to: PartialRoute | string) {
       jump(to, 'push');
     },
-    replace(to: RouteConfig | string) {
+    replace(to: PartialRoute | string) {
       jump(to, 'replace');
     },
   }
-}
-
-export function useRoute() {
-  if (isClient()) {
-    const { href, origin } = location;
-    return parseUrl(href.replace(origin, ''));
-  }
-  return parseUrl(temp.url);
 }

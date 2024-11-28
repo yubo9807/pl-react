@@ -1,5 +1,5 @@
 import { len } from "../utils";
-import { BaseRoute, Query } from "./type";
+import { PartialRoute, Query } from "./type";
 
 /**
  * 解析 url query
@@ -43,7 +43,7 @@ export function parseUrl(url: string) {
  * @param option 
  * @returns 
  */
-export function stringifyUrl(option: BaseRoute) {
+export function stringifyUrl(option: PartialRoute) {
   let url = '';
   const { path, query, hash } = option;
   path && (url += path);

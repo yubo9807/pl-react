@@ -4,12 +4,15 @@ export type Meta = Record<string, any>
 export type Child = any
 
 export interface BaseRoute {
-  path?:  string
-  query?: Query
-  hash?:  string
+  path:  string
+  query: Query
+  hash:  string
 }
 
-export interface RouteConfig extends BaseRoute {
+export interface ResultRoute extends BaseRoute {
+  fullPath: string
+}
+export interface PartialRoute extends Partial<BaseRoute> {
   meta?: Meta
 }
 

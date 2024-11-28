@@ -2,11 +2,10 @@ import { h, Fragment } from '../tools';
 import { useState, useMemo, useEffect } from "..";
 import { AnyObj, isClient, isFunction, isObject, isPromise, isString, nextTick } from "../utils";
 import { createId } from "../utils";
-import { collect, config, createRouter, queryRoute } from "./create-router";
+import { collect, config, createRouter, queryRoute, useRoute } from "./create-router";
 import { temp } from "./ssr-outlet";
 import type { Component, CompTree, Tree, TreeValue } from "../types";
 import type { BeforeEach, RouteItem } from "./type";
-import { parseUrl } from './utils';
 import { getCurrnetInstance } from '../client';
 
 type Props = {
@@ -116,10 +115,11 @@ export function StaticRouter(props: Props) {
     })
   }
 
+  const route = useRoute();
   const router = useMemo(() => {
     temp.count ??= 0;
     temp.count ++;
-    const fristUrl = parseUrl(temp.url).path;
+    const fristUrl = route.path;
     return createRouter({
       fristUrl,
       prefix,
