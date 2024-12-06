@@ -1,4 +1,4 @@
-import { customForEach, ExcludeKey, isClient, isEquals, isRegExp, isString, PromiseType } from "../utils"
+import { ExcludeKey, isClient, isEquals, isRegExp, isString, PromiseType } from "../utils"
 import { BeforeEach, PartialRoute, ResultRoute, RouteItem } from "./type"
 import { parseUrl, stringifyUrl } from "./utils"
 
@@ -46,7 +46,7 @@ class Router {
     const base = config.base;
     if (!fristUrl.startsWith(base)) return;
     this.change(fristUrl.replace(base, '')).then((res: any) => {
-      customForEach(routerChangeFuncs, func => {
+      routerChangeSet.forEach(func => {
         func(res.to, res.from);
       })
     })
@@ -99,7 +99,18 @@ export function createRouter(option: Option) {
 
 
 type RouterChangeFunc = (to: ResultRoute, from: ResultRoute) => void;
-const routerChangeFuncs: RouterChangeFunc[] = [];
+const routerChangeSet: Set<RouterChangeFunc> = new Set();
+/**
+ * 路由监听
+ * @param monitor 
+ * @returns 
+ */
+export function useRouteMonitor(monitor: RouterChangeFunc) {
+  routerChangeSet.add(monitor);
+  return () => {
+    routerChangeSet.delete(monitor);
+  }
+}
 
 // 当前路由
 let currentRoute: ResultRoute
@@ -128,7 +139,7 @@ async function jump(to: PartialRoute | string, type: 'push' | 'replace') {
   currentRoute = target.to;
 
   // 执行注册的监听路由方法
-  customForEach(routerChangeFuncs, func => {
+  routerChangeSet.forEach(func => {
     func(target.to, target.from);
   })
 
@@ -136,9 +147,7 @@ async function jump(to: PartialRoute | string, type: 'push' | 'replace') {
   isClient() && history[type + 'State'](isString(to) ? {} : to.meta, null, url);
 }
 
-export function useRouter(watch?: RouterChangeFunc) {
-  watch && routerChangeFuncs.push(watch);
-
+export function useRouter() {
   return {
     push(to: PartialRoute | string) {
       jump(to, 'push');
