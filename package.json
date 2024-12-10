@@ -1,40 +1,7 @@
 {
   "name": "pl-react",
-  "version": "0.0.4",
+  "version": "0.0.0",
   "description": "Pl React",
-  "main": "lib/index.cjs",
-  "module": "lib/index.js",
-  "types": "lib/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./lib/index.js",
-      "require": "./lib/index.cjs"
-    },
-    "./lib/utils": {
-      "import": "./lib/utils/index.js",
-      "require": "./lib/utils/index.cjs"
-    },
-    "./lib/types": {
-      "import": "./lib/types/index",
-      "require": "./lib/types/index"
-    },
-    "./lib/tools": {
-      "import": "./lib/tools/index.js",
-      "require": "./lib/tools/index.cjs"
-    },
-    "./lib/server": {
-      "import": "./lib/server/index.js",
-      "require": "./lib/server/index.cjs"
-    },
-    "./lib/components": {
-      "import": "./lib/components/index.js",
-      "require": "./lib/components/index.cjs"
-    },
-    "./lib/router": {
-      "import": "./lib/router/index.js",
-      "require": "./lib/router/index.cjs"
-    }
-  },
   "scripts": {
     "dev": "vite -c build/vite.client.ts",
     "preview": "vite preview -c build/vite.client.ts",

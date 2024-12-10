@@ -2,6 +2,14 @@ import { rollup } from 'rollup';
 import typescript2 from 'rollup-plugin-typescript2';
 import { replaceVersion, replaceModuleName } from './plugins/replace';
 import removeFunc from './plugins/remove-func';
+import { existsSync, copyFileSync, mkdirSync } from 'fs';
+
+function mkdir(path: string) {
+  !existsSync(path) && mkdirSync(path, { recursive: true });
+}
+mkdir('lib');
+copyFileSync('core/package.json', 'lib/package.json');
+copyFileSync('readme.md', 'lib/readme.md');
 
 const builds = [
   {

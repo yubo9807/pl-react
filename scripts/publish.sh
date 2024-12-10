@@ -1,12 +1,14 @@
-npm run build:lib &&
+npm run build:lib
 # npm run build:online &&
 
-npm config set registry https://registry.npmjs.org/ &&
-npm publish &&
+cd lib
+npm config set registry https://registry.npmjs.org/
+npm publish
 npm config set registry https://registry.npmmirror.com/
 
-
 VERSION="v$(npm view ./ version)"
+cd ..
+
 git add .
 git commit -m "chore: version $VERSION"
 git tag $VERSION

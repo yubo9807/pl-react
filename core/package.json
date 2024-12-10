@@ -1,0 +1,44 @@
+{
+  "name": "pl-react",
+  "version": "0.0.5",
+  "description": "Pl React",
+  "main": "index.cjs",
+  "module": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "require": "./index.cjs"
+    },
+    "./utils": {
+      "import": "./utils/index.js",
+      "require": "./utils/index.cjs"
+    },
+    "./types": {
+      "import": "./types/index",
+      "require": "./types/index"
+    },
+    "./tools": {
+      "import": "./tools/index.js",
+      "require": "./tools/index.cjs"
+    },
+    "./server": {
+      "import": "./server/index.js",
+      "require": "./server/index.cjs"
+    },
+    "./components": {
+      "import": "./components/index.js",
+      "require": "./components/index.cjs"
+    },
+    "./router": {
+      "import": "./router/index.js",
+      "require": "./router/index.cjs"
+    }
+  },
+  "author": "yubo9807",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yubo9807/pl-react.git"
+  },
+  "license": "ISC"
+}
