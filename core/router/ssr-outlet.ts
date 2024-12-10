@@ -1,4 +1,4 @@
-import { getCurrnetInstance } from "../client";
+import { getCurrnetInstance } from "../instace";
 import { config, setCurrentRoute } from "./create-router";
 import type { TreeValue } from "../types";
 

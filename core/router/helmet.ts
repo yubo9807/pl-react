@@ -1,7 +1,6 @@
-import { useEffect, useMemo } from "..";
-import { Fragment, h } from "../tools";
-import { getCurrnetInstance, nodes_replaceWith } from "../client";
+import { h, Fragment, getCurrnetInstance, useEffect, useMemo } from "../instace";
 import { customForEach, isClient } from "../utils";
+import { nodes_replaceWith } from '../tools';
 import { temp } from "./ssr-outlet";
 import type { Tree } from "../types"
 

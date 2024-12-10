@@ -1,8 +1,9 @@
 import { customForEach, isString, len, nextTick } from "../utils";
+import { Callback, Context, Effect, Memo, Ref, State, Expose, Reducer, Store } from "../hooks";
+import { isTree } from "../tools";
 import { JsxToNodes } from "./jsx-node";
-import { initHooks, isTree } from "../tools";
-import type { Component, CompTree, NodeTree, Tree, TreeValue } from "../types";
 import { jsxToString } from "./jsx-string";
+import type { Component, CompTree, NodeTree, Tree, TreeValue } from "../types";
 // import { clearCompTree, collectChildTree } from "./tree";
 
 let currentApp: ReturnType<typeof createApp>
@@ -22,7 +23,18 @@ export function createApp() {
     globalDirective[name] = directive;
   }
 
-  const hooks = initHooks(stateUpdate);
+  const hooks = {
+    state:        new State({ update: stateUpdate }),
+    memo:         new Memo(),
+    effect:       new Effect(),
+    callback:     new Callback(),
+    layoutEffect: new Effect(),
+    ref:          new Ref(),
+    expose:       new Expose(),
+    context:      new Context(),
+    reducer:      new Reducer({ update: stateUpdate }),
+    store:        new Store(),
+  }
   const hooksValues = Object.values(hooks);
 
   const updateMap = new WeakMap<CompTree, any[]>();

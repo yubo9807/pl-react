@@ -1,6 +1,6 @@
 import { customForEach, isObject } from "../utils";
-import { Component, CompTree, TreeValue } from "../types";
 import { isCompTree } from "../tools";
+import type { Component, CompTree, TreeValue } from "../types";
 
 const compTreeMap = new WeakMap<Component, CompTree[]>();
 

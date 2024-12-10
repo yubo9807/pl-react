@@ -2,7 +2,7 @@ import { createServer } from 'http';
 import app from './basic';
 import App from './app';
 import { ssrOutlet } from "~/core/router";
-import { h } from "~/core/tools";
+import { h } from "~/core";
 import { extname, resolve } from 'path';
 import { readFile, readFileSync } from 'fs';
 

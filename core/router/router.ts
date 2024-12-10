@@ -1,12 +1,9 @@
-import { h, Fragment } from '../tools';
-import { useState, useMemo, useEffect } from "..";
-import { AnyObj, isClient, isFunction, isObject, isPromise, isString, nextTick } from "../utils";
-import { createId } from "../utils";
+import { AnyObj, isClient, isFunction, isObject, isPromise, isString, nextTick, createId } from "../utils";
+import { h, Fragment, getCurrnetInstance, useState, useMemo, useEffect } from '../instace';
 import { collect, config, createRouter, queryRoute, useRoute } from "./create-router";
 import { temp } from "./ssr-outlet";
 import type { Component, CompTree, Tree, TreeValue } from "../types";
 import type { BeforeEach, RouteItem } from "./type";
-import { getCurrnetInstance } from '../client';
 
 type Props = {
   prefix?:     string

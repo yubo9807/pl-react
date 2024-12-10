@@ -1,28 +1,11 @@
 import { customForEach } from "../utils"
-import { h, Fragment, isCompTree, isTree } from "../tools";
-import { getCurrnetInstance } from "../client";
-import { useLayoutEffect, useMemo } from '..'
-import type { CompTree, Tree, TreeValue } from "../types"
-
-type Key = string | Function
-type BackupData = { tree: TreeValue, nodes: HTMLElement[] }
-const keepAliveMap = new Map<Symbol, Map<Key, BackupData>>();
-
-/**
- * 获取 keepAlive 备份数据
- * @param tree 
- * @returns 
- */
-export function getKeepAliveBackup(tree: CompTree) {
-  for (const val of keepAliveMap.values()) {
-    const backup = val.get(tree.attrs.key || tree.tag);
-    if (backup) return backup;
-  }
-}
+import { h, Fragment,  getCurrnetInstance, useLayoutEffect, useMemo } from "../instace";
+import { isCompTree, isTree, keepAliveMap, KeepAliveKey, KeepAliveBackupData } from '../tools'
+import type { Tree } from "../types"
 
 type Props = {
-  include?:  Key[]
-  exclude?:  Key[]
+  include?:  KeepAliveKey[]
+  exclude?:  KeepAliveKey[]
   max?:      number
   children?: Tree[]
 }
@@ -34,7 +17,7 @@ export function KeepAlive(props: Props) {
   const map = useMemo(() => {
     const val = keepAliveMap.get(id);
     if (val) return val;
-    const map = new Map<Key, BackupData>();
+    const map = new Map<KeepAliveKey, KeepAliveBackupData>();
     keepAliveMap.set(id, map);
     return map;
   })

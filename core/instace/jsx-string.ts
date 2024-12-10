@@ -1,6 +1,6 @@
-import { compExec, isFragment, isTree, joinClass } from "../tools";
-import { CompTree, NodeTree, TreeValue } from "../types";
 import { customForEach, isObject, isString } from "../utils";
+import { isFragment, compExec, isTree, joinClass } from "../tools";
+import type { CompTree, NodeTree, TreeValue } from "../types";
 
 type Option = {
   /**

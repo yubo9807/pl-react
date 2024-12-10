@@ -1,11 +1,10 @@
 import { isObject } from "../utils"
-import { h } from "../tools"
+import { h, useMemo, useState } from "../instace"
 import { config, useRouteMonitor, useRouter } from "./create-router"
 import { stringifyUrl } from "./utils"
 import type { PartialRoute } from "./type"
 import type { StyleObject } from "../types"
 import type { RefItem } from "../hooks"
-import { useMemo, useState } from ".."
 
 type LinkProps = {
   to:         PartialRoute | string
