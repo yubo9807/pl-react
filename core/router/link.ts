@@ -1,5 +1,5 @@
 import { isObject } from "../utils"
-import { h, useMemo, useState } from "../instace"
+import { h, useEffect, useMemo, useState } from "../instace"
 import { config, useRouteMonitor, useRouter } from "./create-router"
 import { stringifyUrl } from "./utils"
 import type { PartialRoute } from "./type"
@@ -26,7 +26,7 @@ export function Link(props: LinkProps) {
   const [classList, setClassList] = useState([]);
 
   // 路由监听
-  useMemo(() => useRouteMonitor(to => {
+  const unmonitor = useMemo(() => useRouteMonitor(to => {
     const routePath = props.to + '/', toPath = to.path + '/';
     setClassList([
       toPath.startsWith(routePath) ? 'active' : '',
@@ -34,6 +34,7 @@ export function Link(props: LinkProps) {
       ...[className].flat(),
     ]);
   }), [])
+  useEffect(() => unmonitor, []);
 
   const router = useRouter();
   function onclick(e) {

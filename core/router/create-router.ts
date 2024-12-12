@@ -6,14 +6,28 @@ export const config = {
   base:       '',
   ssrDataKey: 'g_initialProps',
 }
+
+// 当前路由
+let currentRoute: ResultRoute
+export function setCurrentRoute(url: string) {
+  currentRoute = parseUrl(url.replace(config.base, ''));
+}
+
 /**
  * 初始化路由配置
  * @param option 
  */
 export function initRouter(option: Partial<typeof config>) {
   Object.assign(config, option);
+  isClient() && setCurrentRoute(location.href.replace(location.origin, ''));
 }
 
+/**
+ * 查找路由配置
+ * @param routes 
+ * @param pathname 
+ * @returns 
+ */
 export function queryRoute(routes: RouteItem[], pathname: string) {
   for (const route of routes) {
     const { path, exact } = route;
@@ -45,11 +59,7 @@ class Router {
     this.option = args;
     const base = config.base;
     if (!fristUrl.startsWith(base)) return;
-    this.change(fristUrl.replace(base, '')).then((res: any) => {
-      routerChangeSet.forEach(func => {
-        func(res.to, res.from);
-      })
-    })
+    this.change(fristUrl.replace(base, ''));
   }  
 
   change(target: PartialRoute | string) {
@@ -107,17 +117,11 @@ const routerChangeSet: Set<RouterChangeFunc> = new Set();
  */
 export function useRouteMonitor(monitor: RouterChangeFunc) {
   routerChangeSet.add(monitor);
+  monitor(currentRoute, currentRoute);
   return () => {
     routerChangeSet.delete(monitor);
   }
 }
-
-// 当前路由
-let currentRoute: ResultRoute
-export function setCurrentRoute(url: string) {
-  currentRoute = parseUrl(url.replace(config.base, ''));
-}
-isClient() && setCurrentRoute(location.href.replace(location.origin, ''));
 
 export function useRoute() {
   return currentRoute;

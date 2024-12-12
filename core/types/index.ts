@@ -1,15 +1,17 @@
+import type { Fragment } from "../tools"
 import type { AnyObj } from "../utils"
 
 export type BaseComponent = (props: PropsType) => any
 export type ClassComponent = new (props: PropsType) => any
 export type Component = BaseComponent | ClassComponent
 
-export type Tag = keyof HTMLElementTagNameMap | Component
+export type Tag = keyof HTMLElementTagNameMap | Component | typeof Fragment
 
 export type Children = Array<Tree | string | number>
 
 export interface PropsType {
   ref?:      { current: unknown }
+  key?:      string | number | symbol
   children?: Children
 }
 
@@ -22,7 +24,7 @@ export interface Tree {
 }
 
 export interface NodeTree extends Tree {
-  tag:   keyof HTMLElementTagNameMap
+  tag: keyof HTMLElementTagNameMap
 }
 
 export interface CompTree extends Tree {
