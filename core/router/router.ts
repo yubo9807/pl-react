@@ -79,7 +79,7 @@ export function BrowserRouter(props: Props) {
   useEffect(() => {
     function popstate(e: Event) {
       const { origin, href } = location;
-      const url = href.replace(origin + prefix, '');
+      const url = href.replace(origin + prefix, '').replace(config.base, '');
       const route = queryRoute(routes, url);
       changeComp(route, url);
     }

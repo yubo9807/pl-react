@@ -159,5 +159,8 @@ export function useRouter() {
     replace(to: PartialRoute | string) {
       jump(to, 'replace');
     },
+    go(delta: number) {
+      history.go(delta);
+    },
   }
 }
