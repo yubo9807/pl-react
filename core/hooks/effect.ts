@@ -1,4 +1,4 @@
-import { isEquals } from "../utils"
+import { isEquals, isPromise } from "../utils"
 import { BasicHook, Instance, useInstanceTips } from "./utils"
 
 type EffectFunc = () => (Function | void | Promise<Function | void>)
@@ -52,8 +52,8 @@ export class Effect extends BasicHook<EffectItem> {
       // 执行上一次的函数清理
       clear && clear();
 
-      const reslut = await func();
-      item.clear = reslut;
+      const reslut = func();
+      item.clear = isPromise(reslut) ? await reslut : reslut;
       item.oldDeps = deps;
     })
   }
