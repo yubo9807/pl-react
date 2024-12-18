@@ -186,31 +186,29 @@ export class JsxToNodes {
    * 销毁组件
    * @param tree 
    */
-  destroyComp(tree: CompTree, isRemove = true) {
-    const alive = getKeepAliveBackup(tree);
-    const backup = this.treeMap.get(tree);
-    const { tree: oldTree, nodes } = backup;
-    if (alive) {  // 如果设置了 keepAlive，将不会触发钩子，数据也将保留
-      isRemove && nodes_remove(nodes);
-      return;
-    }
+  destroyComp(tree: TreeValue, isRemove = true) {
+    if (!isTree(tree)) return;
 
-    // 卸载子组件
-    if (isTree(oldTree)) {
-      if (isCompTree(oldTree)) {  // 高阶组件
-        this.destroyComp(oldTree);
-      } else {
-        customForEach(oldTree.children, childTree => {
-          if (isTree(childTree) && isCompTree(childTree)) {
-            this.destroyComp(childTree);
-          }
-        })
+    if (isCompTree(tree)) {
+      const alive = getKeepAliveBackup(tree);
+      const backup = this.treeMap.get(tree);
+      const { tree: oldTree, nodes } = backup;
+      if (alive) {  // 如果设置了 keepAlive，将不会触发钩子，数据也将保留
+        isRemove && nodes_remove(nodes);
+        return;
       }
-    }
 
-    this.option.unmount?.(tree, nodes);
-    isRemove && nodes_remove(nodes);
-    this.treeMap.delete(tree);
+      // 卸载子组件
+      this.destroyComp(oldTree);
+
+      this.option.unmount?.(tree, nodes);
+      isRemove && nodes_remove(nodes);
+      this.treeMap.delete(tree);
+    } else {
+      customForEach(tree.children, childTree => {
+        this.destroyComp(childTree);
+      })
+    }
   }
 
   /**
@@ -236,9 +234,7 @@ export class JsxToNodes {
 
       // 节点发生变化，直接替换
       if (newTree.tag !== oldTree.tag) {
-        if (isCompTree(oldTree)) {
-          self.destroyComp(oldTree, false);
-        }
+        self.destroyComp(oldTree, false);
         const newNodes = self.render(newTree);
         nodes_replaceWith(newNodes, nodes);
         return newNodes;
@@ -347,6 +343,9 @@ export class JsxToNodes {
       }
 
     }
+
+    // 卸载组件
+    self.destroyComp(oldTree);
 
     // 删除节点
     if (isEmpty(newTree)) {
