@@ -1,6 +1,6 @@
 import { isFragment } from './h';
 import { BaseComponent, CompTree, Tree, TreeValue } from "../types";
-import { customForEach, isClass, isEmpty, isEquals, isFunction, isObject } from "../utils";
+import { customForEach, isClass, isEmpty, isEquals, isFunction, isObject, setNestedPropertyValue } from "../utils";
 
 export function isTree(tree: any): tree is Tree {
   return isObject(tree) && isObject(tree.attrs);
@@ -36,10 +36,10 @@ export function compExec(tree: CompTree): TreeValue {
 }
 
 export enum DiffType {
-  create  = 1,
-  update  = 2,
-	reserve = 3,
-  remove  = 4,
+  create  = 'create',
+  update  = 'update',
+	// reserve = 'reserve',
+  remove  = 'remove',
 }
 type DiffObjectReturn = {
   key:      string
@@ -61,16 +61,28 @@ export function diffObject(newObj: object, oldObj: object): DiffObjectReturn {
       continue;
     }
 
-    // 数据未发生变化
-    if (isObject(val1) && isObject(val2)) {
-      const { node, ...args } = val2;
-			const value = val1;
-      if (isEquals(value, args)) {
-				if (isTree(value) && isCompTree(value)) {
-					collect.push({ type: DiffType.reserve, ...item });
-				}
-				continue;
-			}
+    /**
+     * 递归收集组件
+     * @param tree1 
+     * @param tree2 
+     */
+    function recursion(tree1: Tree, tree2: Tree, key = '') {
+      // 组件未发生变化，保留原来的实例
+      if (isCompTree(tree1) && isEquals(tree1, tree2)) {
+        setNestedPropertyValue(newObj, key, tree2);
+        return;
+      }
+      key += `.children`;
+      customForEach(tree1.children, (childTree1, i) => {
+        const childTree2 = tree2.children[i];
+        if (isTree(childTree1) && isTree(childTree2)) {
+          recursion(childTree1, childTree2, `${key}.${i}`);
+        }
+      })
+    }
+
+    if (isTree(val1) && isTree(val2)) {
+      recursion(val1, val2, k);
     }
     if (isEquals(val1, val2)) continue;
 

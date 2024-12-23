@@ -1,4 +1,4 @@
-import { customForEach, isObject, isString, isEmpty, isEquals, len } from "../utils";
+import { customForEach, isObject, isString, isEmpty, isEquals, len, setNestedPropertyValue } from "../utils";
 import { isFragment, attrAssign, nodes_after, nodes_remove, nodes_replaceWith, WithNode, isCompTree, isTree, diffObject, DiffType, compExec, getKeepAliveBackup } from "../tools";
 import type { TreeValue, CompTree, NodeTree } from "../types";
 
@@ -301,10 +301,7 @@ export class JsxToNodes {
           const { type, key, newValue, oldValue } = val;
           const childNode = node.childNodes[key];
 
-          if (type === DiffType.reserve) {
-            // 需要替换回旧数据的子组件
-            newTree.children[key] = oldValue;
-          } else if (type === DiffType.remove) {
+          if (type === DiffType.remove) {
             if (isTree(oldValue) && isCompTree(oldValue)) {
               // 卸载子组件
               self.destroyComp(oldValue);
@@ -345,7 +342,9 @@ export class JsxToNodes {
     }
 
     // 卸载组件
-    self.destroyComp(oldTree);
+    if (!newTree) {
+      self.destroyComp(oldTree, false);
+    }
 
     // 删除节点
     if (isEmpty(newTree)) {

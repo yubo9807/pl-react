@@ -4,3 +4,5 @@ export * from './simplify';
 export * from './type';
 export * from './cache';
 export * from './string';
+export * from './object';
+
