@@ -62,29 +62,27 @@ export function diffObject(newObj: object, oldObj: object): DiffObjectReturn {
     }
 
     /**
-     * 递归收集组件
+     * 递归检查对象是否发生变化
      * @param tree1 
      * @param tree2 
      */
-    function recursion(tree1: Tree, tree2: Tree, key = '') {
-      // 组件未发生变化，保留原来的实例
-      if (isCompTree(tree1) && isEquals(tree1, tree2)) {
-        setNestedPropertyValue(newObj, key, tree2);
-        return;
-      }
-      key += `.children`;
-      customForEach(tree1.children, (childTree1, i) => {
-        const childTree2 = tree2.children[i];
-        if (isTree(childTree1) && isTree(childTree2)) {
-          recursion(childTree1, childTree2, `${key}.${i}`);
+    function recursion(tree1, tree2, key = '') {
+      if (isTree(tree1) && isTree(tree2)) {
+        // 组件未发生变化，但需要保留原来的实例
+        if (isCompTree(tree1) && isEquals(tree1, tree2)) {
+          setNestedPropertyValue(newObj, key, tree2);
+          return true;
         }
-      })
+        key += `.children`;
+        customForEach(tree1.children, (childTree1, i) => {
+          const childTree2 = tree2.children[i];
+          recursion(childTree1, childTree2, `${key}.${i}`);
+        })
+      } else {
+        return isEquals(tree1, tree2);
+      }
     }
-
-    if (isTree(val1) && isTree(val2)) {
-      recursion(val1, val2, k);
-    }
-    if (isEquals(val1, val2)) continue;
+    if (recursion(val1, val2, k)) continue;
 
     // 更新
     collect.push({ type: DiffType.update, ...item });
