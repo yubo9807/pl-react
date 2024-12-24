@@ -90,11 +90,6 @@ export function createApp() {
     mount(tree, childTree, nodes) {
       hooks.layoutEffect.run(tree);
     },
-    refresh(tree) {
-      // 这里为什么不需要执行 effect
-      // hooks.effect.runEffects(tree);
-      hooks.layoutEffect.run(tree);
-    },
     unmount(tree, nodes) {
       hooks.effect.runClear(tree);
       hooks.layoutEffect.runClear(tree);

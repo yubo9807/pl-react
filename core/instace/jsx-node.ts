@@ -224,6 +224,9 @@ export class JsxToNodes {
     this.updateTree(newTree, backup.tree, backup.nodes); 
     backup.tree = newTree;  // 旧数据替换
 
+    const { mount } = this.option;
+    mount && mount(tree, newTree, backup.nodes);
+
     return newTree;
   }
 
@@ -335,7 +338,8 @@ export class JsxToNodes {
         const tree = self.compTreeExec(newTree);
         const newNodes = self.updateTree(tree, backup.tree, nodes);
         backup.tree = tree;
-        self.option.refresh?.(newTree, tree, nodes);
+        const { mount } = this.option;
+        mount && mount(newTree, tree, newNodes);
         return newNodes;
       }
 
