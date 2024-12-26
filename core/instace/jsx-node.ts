@@ -245,7 +245,7 @@ export class JsxToNodes {
 
       // 节点片段
       if (isFragment(newTree.tag)) {
-        const childNodes = self.fragmentMap.get(oldTree);
+        const childNodes = self.fragmentMap.get(oldTree) || nodes;
         const newChildNodes: WithNode[] = [];
         customForEach(newTree.children, (newChildTree, i) => {
           const oldChildTree = oldTree.children[i];
@@ -317,12 +317,17 @@ export class JsxToNodes {
             const newNodes = self.render(newValue);
             node.append(...newNodes);
           } else {
-            // 组件
-            if (isTree(oldValue) && isCompTree(oldValue)) {
-              self.updateTree(newValue, oldValue, self.treeMap.get(oldValue).nodes);
-            } else {
-              self.updateTree(newValue, oldValue, [childNode]);
+            let updateNodes = [childNode];
+            if (isTree(oldValue)) {
+              // 组件
+              if (isCompTree(oldValue)) {
+                updateNodes = self.treeMap.get(oldValue).nodes;
+              } else if (isFragment(oldValue.tag)) {
+                // @ts-ignore
+                updateNodes = node.childNodes;
+              }
             }
+            self.updateTree(newValue, oldValue, updateNodes);
           }
         })
 
