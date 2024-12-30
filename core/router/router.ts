@@ -1,6 +1,6 @@
 import { AnyObj, isClient, isFunction, isObject, isPromise, isString, nextTick, createId } from "../utils";
 import { h, Fragment, getCurrnetInstance, useState, useMemo, useEffect } from '../instace';
-import { collect, config, createRouter, queryRoute, useRoute } from "./create-router";
+import { collect, config, createRouter, queryRoute, useRouter } from "./create-router";
 import { temp } from "./ssr-outlet";
 import type { Component, CompTree, Tree, TreeValue } from "../types";
 import type { BeforeEach, RouteItem } from "./type";
@@ -112,7 +112,7 @@ export function StaticRouter(props: Props) {
     })
   }
 
-  const route = useRoute();
+  const route = useRouter().current;
   const router = useMemo(() => {
     temp.count ??= 0;
     temp.count ++;

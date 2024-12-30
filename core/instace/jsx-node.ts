@@ -1,4 +1,4 @@
-import { customForEach, isObject, isString, isEmpty, isEquals, len, setNestedPropertyValue } from "../utils";
+import { customForEach, isObject, isString, isEmpty, isEquals, len } from "../utils";
 import { isFragment, attrAssign, nodes_after, nodes_remove, nodes_replaceWith, WithNode, isCompTree, isTree, diffObject, DiffType, compExec, getKeepAliveBackup } from "../tools";
 import type { TreeValue, CompTree, NodeTree } from "../types";
 

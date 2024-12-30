@@ -112,19 +112,15 @@ type RouterChangeFunc = (to: ResultRoute, from: ResultRoute) => void;
 const routerChangeSet: Set<RouterChangeFunc> = new Set();
 /**
  * 路由监听
- * @param monitor 
+ * @param func 
  * @returns 
  */
-export function useRouteMonitor(monitor: RouterChangeFunc) {
-  routerChangeSet.add(monitor);
-  monitor(currentRoute, currentRoute);
+function monitor(func: RouterChangeFunc) {
+  routerChangeSet.add(func);
+  func(currentRoute, currentRoute);
   return () => {
-    routerChangeSet.delete(monitor);
+    routerChangeSet.delete(func);
   }
-}
-
-export function useRoute() {
-  return currentRoute;
 }
 
 /**
@@ -162,5 +158,7 @@ export function useRouter() {
     go(delta: number) {
       history.go(delta);
     },
+    monitor,
+    current: currentRoute,
   }
 }

@@ -1,6 +1,6 @@
 import { isObject } from "../utils"
 import { h, useEffect, useState } from "../instace"
-import { config, useRouteMonitor, useRouter } from "./create-router"
+import { config, useRouter } from "./create-router"
 import { stringifyUrl } from "./utils"
 import type { PartialRoute } from "./type"
 import type { StyleObject } from "../types"
@@ -25,8 +25,9 @@ export function Link(props: LinkProps) {
 
   const [classList, setClassList] = useState([]);
 
+  const router = useRouter();
   // 路由监听
-  useEffect(() => useRouteMonitor(to => {
+  useEffect(() => router.monitor(to => {
     const routePath = props.to + '/', toPath = to.path + '/';
     setClassList([
       toPath.startsWith(routePath) ? 'active' : '',
@@ -35,7 +36,6 @@ export function Link(props: LinkProps) {
     ]);
   }), []);
 
-  const router = useRouter();
   function onclick(e) {
     e.preventDefault();
 

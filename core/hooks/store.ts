@@ -3,7 +3,7 @@ import { BasicHook, useInstanceTips } from "./utils";
 import { getCurrnetInstance } from "..";
 import type { CompTree } from "../types";
 
-const map = new Map<object, Set<CompTree>>();
+const map = new Map<object, Set<object>>();
 
 export function defineStore<S, A extends ReducerAction>(
   handle: ReducerHandle<S, A>,
@@ -14,7 +14,7 @@ export function defineStore<S, A extends ReducerAction>(
 
   function update() {
     map.get(key).forEach(tree => {
-      getCurrnetInstance().compUpdate(tree);
+      getCurrnetInstance().compUpdate(tree as CompTree);
     })
   }
 
@@ -43,9 +43,9 @@ export class Store extends BasicHook<StoreItem> {
 
     const set = map.get(key);
     if (set) {
-      set.add(instance as CompTree);
+      set.add(instance);
     } else {
-      map.set(key, new Set([instance as CompTree]));
+      map.set(key, new Set([instance]));
     }
 
     reducer.count = 0;
