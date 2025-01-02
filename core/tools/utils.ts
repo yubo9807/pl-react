@@ -26,13 +26,18 @@ export function compExec(tree: CompTree): TreeValue {
 
   let comp = tag as BaseComponent;
 
+  // 类组件
   if (isClass(tag)) {
-    // 将类组件变为函数组件
     const t = new tag(props);
     comp = t.render.bind(t);
   }
 
-  return comp(props);
+  // 高阶组件，没有任何多余的其他元素
+  let result = comp(props);
+  if (isCompTree(result)) {
+    return compExec(result);
+  }
+  return result;
 }
 
 export enum DiffType {
