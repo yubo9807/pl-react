@@ -63,7 +63,7 @@ export function BrowserRouter(props: Props) {
   }
 
   const router = useMemo(() => {
-    const fristUrl = location.pathname;
+    const fristUrl = config.base + useRouter().current.path;
     return createRouter({
       fristUrl,
       prefix,
@@ -78,8 +78,7 @@ export function BrowserRouter(props: Props) {
 
   useEffect(() => {
     function popstate(e: Event) {
-      const { origin, href } = location;
-      const url = href.replace(origin + prefix, '').replace(config.base, '');
+      const url = useRouter().current.path.replace(prefix, '');
       const route = queryRoute(routes, url);
       changeComp(route, url);
     }
@@ -102,21 +101,20 @@ export function StaticRouter(props: Props) {
   const routes = useRoutes(props);
 
   const app = getCurrnetInstance();
-  const [child] = useState('r_' + createId());
+  const [id] = useState('r_' + createId());
 
   function replaceStr(tree: TreeValue) {
-    temp.count --;
     nextTick(() => {
-      const result = temp.text.replace(child, app.renderToString(tree));
-      temp.count === 0 && temp.done(result);
+      temp.text = temp.text.replace(id, app.renderToString(tree));
+      temp.count --;
+      temp.count <= 0 && temp.done(temp.text);
     })
   }
 
-  const route = useRouter().current;
-  const router = useMemo(() => {
+  useMemo(() => {
     temp.count ??= 0;
     temp.count ++;
-    const fristUrl = route.path;
+    const fristUrl = config.base + useRouter().current.path;
     return createRouter({
       fristUrl,
       prefix,
@@ -152,7 +150,7 @@ export function StaticRouter(props: Props) {
   }, [])
 
   // @ts-ignore
-  return h(Fragment, {}, child);
+  return h(Fragment, {}, id);
 }
 
 export function Router(props: Props) {

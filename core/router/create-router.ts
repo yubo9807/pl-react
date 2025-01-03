@@ -4,13 +4,14 @@ import { parseUrl, stringifyUrl } from "./utils"
 
 export const config = {
   base:       '',
+  mode:       'history' as 'history' | 'hash',
   ssrDataKey: 'g_initialProps',
 }
 
 // 当前路由
 let currentRoute: ResultRoute
 export function setCurrentRoute(url: string) {
-  currentRoute = parseUrl(url.replace(config.base, ''));
+  currentRoute = parseUrl(url);
 }
 
 /**
@@ -19,7 +20,11 @@ export function setCurrentRoute(url: string) {
  */
 export function initRouter(option: Partial<typeof config>) {
   Object.assign(config, option);
-  isClient() && setCurrentRoute(location.href.replace(location.origin, ''));
+  if (!isClient()) return;
+  const { href, origin, hash } = location;
+  const { base, mode } = config;
+  const url = mode === 'history' ? href.replace(origin + base, '') : hash.slice(1);
+  setCurrentRoute(url);
 }
 
 /**
@@ -134,6 +139,7 @@ async function jump(to: PartialRoute | string, type: 'push' | 'replace') {
     const res = await router.change(to);
     target = res;
   }
+  if (isEquals(target.to, target.from)) return;
 
   // 当前路由
   currentRoute = target.to;
@@ -143,8 +149,13 @@ async function jump(to: PartialRoute | string, type: 'push' | 'replace') {
     func(target.to, target.from);
   })
 
-  const url = config.base + target.to.fullPath;
-  isClient() && history[type + 'State'](isString(to) ? {} : to.meta, null, url);
+  const url = target.to.fullPath;
+  if (!isClient()) return;
+  if (config.mode === 'history') {
+    history[type + 'State'](isString(to) ? {} : to.meta, null, config.base + url);
+  } else {
+    location.hash = url;
+  }
 }
 
 export function useRouter() {
