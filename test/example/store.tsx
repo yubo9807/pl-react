@@ -32,7 +32,7 @@ function App() {
 }
 
 function Comp1() {
-  const [ state, dispatch ] = useStore(testStore);
+  const { state, dispatch } = useStore(testStore);
 
   return <div>
     Comp1:
@@ -42,7 +42,7 @@ function Comp1() {
 }
 
 function Comp2() {
-  const [ state, dispatch ] = useStore(testStore);
+  const { state, dispatch } = useStore(testStore);
 
   return <div>
     Comp2:

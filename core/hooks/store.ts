@@ -33,8 +33,8 @@ export function defineStore<S, A extends ReducerAction>(
 type StoreItem = {}
 export class Store extends BasicHook<StoreItem> {
 
-  use<S extends ReturnType<typeof defineStore>>(store: S):
-    [S['state'], (action: Parameters<S['handle']>[1]) => void]
+  use<S extends ReturnType<typeof defineStore>>(store: S)
+    : { state: S['state'], dispatch: (action: Parameters<S['handle']>[1]) => void }
   {
     const { instance } = this;
     useInstanceTips(instance);
@@ -50,7 +50,11 @@ export class Store extends BasicHook<StoreItem> {
 
     reducer.count = 0;
 
-    return reducer.use(handle, state, init);
+    const [data, dispatch] = reducer.use(handle, state, init);
+    return {
+      state: data,
+      dispatch,
+    }
   }
 
   remove(tree: CompTree) {
