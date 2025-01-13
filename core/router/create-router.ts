@@ -15,16 +15,25 @@ export function setCurrentRoute(url: string) {
 }
 
 /**
+ * 根据模式获取当前 url
+ * @returns 
+ */
+export function getUrl() {
+  const { origin, href, hash } = location;
+  if (config.mode === 'history') {
+    return href.replace(origin + config.base, '');
+  }
+  return hash.slice(1);
+}
+
+/**
  * 初始化路由配置
  * @param option 
  */
 export function initRouter(option: Partial<typeof config>) {
   Object.assign(config, option);
   if (!isClient()) return;
-  const { href, origin, hash } = location;
-  const { base, mode } = config;
-  const url = mode === 'history' ? href.replace(origin + base, '') : hash.slice(1);
-  setCurrentRoute(url);
+  setCurrentRoute(getUrl());
 }
 
 /**
