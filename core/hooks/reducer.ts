@@ -1,3 +1,4 @@
+import { isEquals, isPromise } from "../utils";
 import { BasicHook, Instance, useInstanceTips } from "./utils";
 
 export type ReducerAction = {
@@ -40,10 +41,16 @@ export class Reducer extends BasicHook<ReducerItem> {
     // 初始化
     state = init ? init(state) : state;
 
-    async function dispatch(action: A) {
-      state = await reducer(state, action);
-      map.set(count, { state, dispatch });
-      option.update(instance);
+    function dispatch(action: A) {
+      let result = reducer(state, action);
+      function update(result: S) {
+        if (isEquals(state, result)) return state;
+        state = result;
+        map.set(count, { state, dispatch });
+        option.update(instance);
+        return state;
+      }
+      return isPromise(result) ? result.then(res => update(res)) : update(result);
     }
 
     map.set(count, { state, dispatch });
