@@ -91,10 +91,6 @@ export function diffObject(newObj: object, oldObj: object): DiffObjectReturn {
 
     // 更新
     collect.push({ type: DiffType.update, ...item });
-
-    if (!isObject(val1) && !isFunction(val1)) {
-      oldObj[k] = val1;
-    }
   }
 
   for (const k of keys2) {
