@@ -2,6 +2,7 @@ import { AnyObj, isClient, isFunction, isObject, isPromise, isString, nextTick, 
 import { h, Fragment, getCurrnetInstance, useState, useMemo, useEffect } from '../instace';
 import { collect, config, createRouter, getUrl, queryRoute, useRouter } from "./create-router";
 import { temp } from "./ssr-outlet";
+import { parseUrl } from "./utils";
 import type { Component, CompTree, Tree, TreeValue } from "../types";
 import type { BeforeEach, RouteItem } from "./type";
 
@@ -79,7 +80,7 @@ export function BrowserRouter(props: Props) {
   useEffect(() => {
     function popstate(e: Event) {
       const url = getUrl().replace(prefix, '');
-      const route = queryRoute(routes, url);
+      const route = queryRoute(routes, parseUrl(url).path);
       changeComp(route, url);
     }
     window.addEventListener('popstate', popstate);

@@ -88,7 +88,7 @@ class Router {
 
       this.beforeEach(to, from, () => {
         this.currentRoute = to;
-        const query = queryRoute(routes, to.fullPath.replace(prefix, ''));
+        const query = queryRoute(routes, to.path.replace(prefix, ''));
 
         function finish() {
           controls(query);
@@ -143,6 +143,9 @@ function monitor(func: RouterChangeFunc) {
  * @param type 
  */
 async function jump(to: PartialRoute | string, type: 'push' | 'replace') {
+  if (!isString(to)) {
+    to.path ??= currentRoute.path;
+  }
   let target: PromiseType<ReturnType<Router['change']>>
   for (const router of collect.values()) {
     const res = await router.change(to);
