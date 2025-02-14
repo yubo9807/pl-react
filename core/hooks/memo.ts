@@ -1,5 +1,4 @@
-import { isEquals } from "../utils";
-import { BasicHook, useInstanceTips } from "./utils";
+import { BasicHook, isEquals, useInstanceTips } from "./utils";
 
 type MemoDeps = any[]
 type MemoItem = {
@@ -21,7 +20,7 @@ export class Memo extends BasicHook<MemoItem> {
     const map = dataMap.get(instance) || new Map<number, MemoItem>();
     const item = map.get(count);
 
-    if (item && deps !== void 0 && isEquals(deps, item.deps)) {
+    if (item && isEquals(deps, item.deps)) {
       this.count ++;
       return item.result;
     }

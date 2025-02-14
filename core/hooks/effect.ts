@@ -1,5 +1,5 @@
-import { isEquals, isPromise } from "../utils"
-import { BasicHook, Instance, useInstanceTips } from "./utils"
+import { isPromise } from "../utils"
+import { BasicHook, Instance, isEquals, useInstanceTips } from "./utils"
 
 type EffectFunc = () => (Function | void | Promise<Function | void>)
 type EffectDeps = any[]

@@ -44,3 +44,15 @@ export function useInstanceTips(instance: object) {
     throwError('Please set the instance first');
   }
 }
+
+export function isEqual(val: any, val2: any) {
+  return Object.is(val, val2);
+}
+
+export function isEquals(arr1: object[], arr2: object[]) {
+  if ([arr1, arr2].includes(void 0)) return false;
+  for (const k in arr1) {
+    if (!Object.is(arr1[k], arr2[k])) return false;
+  }
+  return true;
+}

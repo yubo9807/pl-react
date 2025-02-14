@@ -1,5 +1,4 @@
-import { isEquals } from "../utils";
-import { BasicHook, useInstanceTips } from "./utils";
+import { BasicHook, isEquals, useInstanceTips } from "./utils";
 
 type CallBackDeps = any[]
 type CallBackItem = {
@@ -21,7 +20,7 @@ export class Callback extends BasicHook<CallBackItem> {
     const map = dataMap.get(instance) || new Map<number, CallBackItem>();
     const item = map.get(count);
 
-    if (item && deps !== void 0 && isEquals(deps, item.deps)) {
+    if (isEquals(deps, item.deps)) {
       return item.func as T;
     }
 

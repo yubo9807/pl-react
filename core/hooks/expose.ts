@@ -1,6 +1,5 @@
-import { isEquals } from "../utils";
 import { RefItem } from "./ref";
-import { BasicHook, useInstanceTips } from "./utils";
+import { BasicHook, isEquals, useInstanceTips } from "./utils";
 
 type ExposeItem = {
   expose: any
@@ -23,7 +22,7 @@ export class Expose extends BasicHook<ExposeItem> {
     const item = map.get(count);
 
     // 不存在 || 依赖项发生变化
-    if (!item || item.deps === void 0 || !isEquals(item.deps, deps)) {
+    if (!item || !isEquals(item.deps, deps)) {
       const expose = handle();
       ref.current = expose;
       map.set(count, { expose, deps });
