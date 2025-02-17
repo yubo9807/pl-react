@@ -1,4 +1,4 @@
-import { AnyObj, isClient, isFunction, isObject, isPromise, isString, nextTick, createId } from "../utils";
+import { AnyObj, isClient, isFunction, isObject, isPromise, isString, nextTick, createId, isEquals } from "../utils";
 import { h, Fragment, getCurrnetInstance, useState, useMemo, useEffect } from '../instace';
 import { collect, config, createRouter, getUrl, queryRoute, useRouter } from "./create-router";
 import { temp } from "./ssr-outlet";
@@ -55,16 +55,19 @@ export function BrowserRouter(props: Props) {
         loading && setChild(loading);  // 组件无法直接渲染，先渲染loading
         getInitialProps().then(res => {
           tree.attrs.data = res;
+          if (isEquals(child, tree)) return;
           setChild(tree);
         })
       }
     } else {
+      if (isEquals(child, tree)) return;
       setChild(tree);
     }
   }
 
+  const r = useRouter();
   const router = useMemo(() => {
-    const fristUrl = config.base + useRouter().current.path;
+    const fristUrl = config.base + r.current.path;
     return createRouter({
       fristUrl,
       prefix,
@@ -75,6 +78,12 @@ export function BrowserRouter(props: Props) {
       },
     });
   }, [])
+
+  // 因为 useMemo 缓存的问题，拿不到最新的值，所以将回调重写
+  router.option.controls = (route) => {
+    if (config.mode === 'hash') return;
+    changeComp(route, r.current.path);
+  }
 
 
   useEffect(() => {
@@ -102,7 +111,7 @@ export function StaticRouter(props: Props) {
   const routes = useRoutes(props);
 
   const app = getCurrnetInstance();
-  const [id] = useState('r_' + createId());
+  const id = useMemo(() => 'r_' + createId());
 
   function replaceStr(tree: TreeValue) {
     nextTick(() => {
