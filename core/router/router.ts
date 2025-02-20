@@ -1,8 +1,7 @@
 import { AnyObj, isClient, isFunction, isObject, isPromise, isString, nextTick, createId, isEquals } from "../utils";
 import { h, Fragment, getCurrnetInstance, useState, useMemo, useEffect } from '../instace';
-import { collect, config, createRouter, getUrl, queryRoute, useRouter } from "./create-router";
+import { collect, config, createRouter, getUrl, useRouter } from "./create-router";
 import { temp } from "./ssr-outlet";
-import { parseUrl } from "./utils";
 import type { Component, CompTree, Tree, TreeValue } from "../types";
 import type { BeforeEach, RouteItem } from "./type";
 
@@ -22,6 +21,18 @@ function getRouteKey(path: string | RegExp, url: string) {
   const matched = url.match(path);
   if (matched) return matched[0];
 }
+async function getTag(element: any) {
+  if (isFunction(element) && !element.prototype) {
+    const result = element();
+    if (isPromise(result)) {
+      return (await result).default;
+    }
+  }
+  if (isPromise(element)) {
+    return (await element).default;
+  }
+  return element;
+}
 
 export function BrowserRouter(props: Props) {
   props.prefix ??= '';
@@ -37,10 +48,7 @@ export function BrowserRouter(props: Props) {
     const key = getRouteKey(path, url);
     const attrs: AnyObj = { path: prefix + key, meta }
     const tree = { tag: element, attrs }
-
-    if (isPromise(element)) {
-      tree.tag = (await element).default;
-    }
+    tree.tag = await getTag(element);
 
     const { getInitialProps } = element;
 
@@ -81,7 +89,6 @@ export function BrowserRouter(props: Props) {
 
   // 因为 useMemo 缓存的问题，拿不到最新的值，所以将回调重写
   router.option.controls = (route) => {
-    if (config.mode === 'hash') return;
     changeComp(route, r.current.path);
   }
 
@@ -89,8 +96,7 @@ export function BrowserRouter(props: Props) {
   useEffect(() => {
     function popstate(e: Event) {
       const url = getUrl().replace(prefix, '');
-      const route = queryRoute(routes, parseUrl(url).path);
-      changeComp(route, url);
+      r.replace(url);
     }
     window.addEventListener('popstate', popstate);
 
@@ -137,10 +143,7 @@ export function StaticRouter(props: Props) {
         const key = getRouteKey(path, fristUrl);
         const attrs: AnyObj = { path: prefix + key, meta }
         const tree = { tag: element, attrs } as Tree
-
-        if (isPromise(element)) {
-          tree.tag = (await element).default;
-        }
+        tree.tag = await getTag(element);
 
         // @ts-ignore
         const { getInitialProps } = tree.tag;

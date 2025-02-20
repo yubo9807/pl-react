@@ -161,13 +161,11 @@ async function jump(to: PartialRoute | string, type: 'push' | 'replace') {
     func(target.to, target.from);
   })
 
-  const url = target.to.fullPath;
   if (!isClient()) return;
-  if (config.mode === 'history') {
-    history[type + 'State'](isString(to) ? {} : to.meta, null, config.base + url);
-  } else {
-    location.hash = url;
-  }
+  const { fullPath } = target.to;
+  const targetUrl = config.mode === 'history' ? fullPath : '#' + fullPath;
+  const meta = isString(to) ? {} : to.meta;
+  history[type + 'State'](meta, null, config.base + targetUrl);
 }
 
 export function useRouter() {
