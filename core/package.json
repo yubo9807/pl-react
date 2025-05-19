@@ -1,6 +1,6 @@
 {
   "name": "pl-react",
-  "version": "0.0.9",
+  "version": "0.0.0",
   "description": "Pl React",
   "main": "index.cjs",
   "module": "index.js",

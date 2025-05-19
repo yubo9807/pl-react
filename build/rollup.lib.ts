@@ -2,14 +2,21 @@ import { rollup } from 'rollup';
 import typescript2 from 'rollup-plugin-typescript2';
 import { replaceVersion, replaceModuleName } from './plugins/replace';
 import removeFunc from './plugins/remove-func';
-import { existsSync, copyFileSync, mkdirSync } from 'fs';
+import { existsSync, copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 
 function mkdir(path: string) {
   !existsSync(path) && mkdirSync(path, { recursive: true });
 }
 mkdir('lib');
-copyFileSync('core/package.json', 'lib/package.json');
 copyFileSync('readme.md', 'lib/readme.md');
+(async function () {
+  const tem = await readFileSync('core/package.json', 'utf8');
+  const temJson = JSON.parse(tem);
+  const res = await readFileSync('package.json', 'utf8');
+  const { version } = JSON.parse(res);
+  temJson.version = version;
+  writeFileSync('lib/package.json', JSON.stringify(temJson, null, 2));
+})();
 
 const builds = [
   {

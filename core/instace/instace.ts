@@ -203,6 +203,8 @@ export function createApp() {
     compResult(tree: CompTree) {
       return structure.treeMap.get(tree);
     },
+
+    version: process.env.version,
   }
   Object.setPrototypeOf(instance, hooks);
 
