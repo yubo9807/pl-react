@@ -8,9 +8,7 @@ import type { CompTree } from '../types';
  * 获取当前实例
  * @returns 
  */
-function getHooks(): any {
-  return getCurrnetInstance();
-}
+const getHooks: any = getCurrnetInstance;
 
 // #region hooks
 export const useState: State['use'] = (initialValue) => {

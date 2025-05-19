@@ -12,9 +12,14 @@ export function defineStore<S, A extends ReducerAction>(
 ) {
   const key = { id: Math.random() };
 
+  let app: ReturnType<typeof getCurrnetInstance>;
+  function bind(currentApp: typeof app) {
+    app = currentApp;
+  }
+
   function update() {
     map.get(key).forEach(tree => {
-      getCurrnetInstance().compUpdate(tree as CompTree);
+      app.compUpdate(tree as CompTree);
     })
   }
 
@@ -27,6 +32,7 @@ export function defineStore<S, A extends ReducerAction>(
     state,
     init,
     key,
+    bind,
   };
 }
 
@@ -39,7 +45,8 @@ export class Store extends BasicHook<StoreItem> {
     const { instance } = this;
     useInstanceTips(instance);
 
-    const { reducer, handle, state, init, key } = store;
+    const { reducer, handle, state, init, key, bind } = store;
+    bind(getCurrnetInstance());
 
     const set = map.get(key);
     if (set) {
