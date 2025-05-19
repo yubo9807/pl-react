@@ -50,7 +50,7 @@ export function BrowserRouter(props: Props) {
     const tree = { tag: element, attrs }
     tree.tag = await getTag(element);
 
-    const { getInitialProps } = element;
+    const { getInitialProps } = tree.tag;
 
     if (isFunction(getInitialProps)) {
       // @ts-ignore
