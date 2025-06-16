@@ -7,7 +7,7 @@ import { PartialRoute, Query } from "./type";
  * @returns 
  */
 export function parseQuery(url: string) {
-	const query = {};
+	const query: Record<string, string> = {};
 	url.replace(/([^?&=]+)=([^&]+)/g, (_, k, v) => (query[k] = v));
 	return query;
 }

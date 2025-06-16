@@ -1,6 +1,6 @@
-import { AnyObj, isClient, isFunction, isObject, isPromise, isString, nextTick, createId, isEquals } from "../utils";
+import { AnyObj, isClient, isFunction, isObject, isPromise, isString, nextTick, createId } from "../utils";
 import { h, Fragment, getCurrnetInstance, useState, useMemo, useEffect } from '../instace';
-import { collect, config, createRouter, getUrl, useRouter } from "./create-router";
+import { config, createRouter, getUrl, useRouter } from "./create-router";
 import { temp } from "./ssr-outlet";
 import type { Component, CompTree, Tree, TreeValue } from "../types";
 import type { BeforeEach, RouteItem } from "./type";
@@ -21,18 +21,6 @@ function getRouteKey(path: string | RegExp, url: string) {
   const matched = url.match(path);
   if (matched) return matched[0];
 }
-async function getTag(element: any) {
-  if (isFunction(element) && !element.prototype) {
-    const result = element();
-    if (isPromise(result)) {
-      return (await result).default;
-    }
-  }
-  if (isPromise(element)) {
-    return (await element).default;
-  }
-  return element;
-}
 
 export function BrowserRouter(props: Props) {
   props.prefix ??= '';
@@ -40,6 +28,7 @@ export function BrowserRouter(props: Props) {
   const routes = useRoutes(props);
 
   const [child, setChild] = useState(null);
+  const collect = useMemo(() => new Set(), []);
 
   async function changeComp(route: RouteItem, url: string) {
     if (!route) return setChild(null);
@@ -47,11 +36,20 @@ export function BrowserRouter(props: Props) {
     const { path, element, meta } = route;
     const key = getRouteKey(path, url);
     const attrs: AnyObj = { path: prefix + key, meta }
-    const tree = { tag: element, attrs }
-    tree.tag = await getTag(element);
+    const tree = { tag: element, attrs, children: [] }
+    if (isFunction(element) && !element.prototype) {
+      tree.tag = element();
+    }
+    if (isPromise(tree.tag)) {
+      // loading && !collect.has(key) && setChild(loading);
+      tree.tag = (await tree.tag).default;
+    } else {
+      tree.tag = element;
+    }
+    if (child?.tag === tree.tag) return;
+    collect.add(path);
 
     const { getInitialProps } = tree.tag;
-
     if (isFunction(getInitialProps)) {
       // @ts-ignore
       const initialProps = window[config.ssrDataKey];
@@ -61,35 +59,35 @@ export function BrowserRouter(props: Props) {
         delete initialProps[key];
       } else {
         loading && setChild(loading);  // 组件无法直接渲染，先渲染loading
-        getInitialProps().then(res => {
+        getInitialProps({ url, path }).then(res => {
           tree.attrs.data = res;
-          if (isEquals(child, tree)) return;
+        }).catch(err => {
+          tree.attrs.error = err;
+        }).finally(() => {
           setChild(tree);
         })
       }
     } else {
-      if (isEquals(child, tree)) return;
       setChild(tree);
     }
   }
 
   const r = useRouter();
   const router = useMemo(() => {
-    const fristUrl = config.base + r.current.path;
     return createRouter({
-      fristUrl,
+      fristUrl: config.base + r.current.fullPath,
       prefix,
       routes,
       beforeEach,
-      controls(route) {
-        changeComp(route, fristUrl);
+      controls(route, to) {
+        changeComp(route, to.fullPath);
       },
     });
   }, [])
 
   // 因为 useMemo 缓存的问题，拿不到最新的值，所以将回调重写
-  router.option.controls = (route) => {
-    changeComp(route, r.current.path);
+  router.option.controls = (route, to) => {
+    changeComp(route, to.fullPath);
   }
 
 
@@ -130,9 +128,9 @@ export function StaticRouter(props: Props) {
   useMemo(() => {
     temp.count ??= 0;
     temp.count ++;
-    const fristUrl = config.base + useRouter().current.path;
+    const url = useRouter().current.fullPath;
     return createRouter({
-      fristUrl,
+      fristUrl: config.base + url,
       prefix,
       routes,
       beforeEach,
@@ -140,19 +138,28 @@ export function StaticRouter(props: Props) {
         if (!route) return replaceStr('');
 
         const { path, element, meta } = route;
-        const key = getRouteKey(path, fristUrl);
+        const key = getRouteKey(path, url);
         const attrs: AnyObj = { path: prefix + key, meta }
         const tree = { tag: element, attrs } as Tree
-        tree.tag = await getTag(element);
+        if (isFunction(element) && !element.prototype) {
+          tree.tag = element();
+        }
+        if (isPromise(tree.tag)) {
+          tree.tag = (await tree.tag).default;
+        } else {
+          tree.tag = element;
+        }
 
         // @ts-ignore
         const { getInitialProps } = tree.tag;
         if (isFunction(getInitialProps)) {
-          getInitialProps().then(res => {
+          getInitialProps({ url, path }).then(res => {
             // 服务端数据
             temp.data[key] = res;
-
             attrs.data = res;
+          }).catch(err => {
+            attrs.errotr = err;
+          }).finally(() => {
             replaceStr(tree);
           })
         } else {

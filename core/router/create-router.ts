@@ -56,7 +56,7 @@ export function queryRoute(routes: RouteItem[], pathname: string) {
 type Option = {
   fristUrl:    string
   routes:      RouteItem[]
-  controls:    (route?: RouteItem) => void
+  controls:    (route?: RouteItem, to?: ResultRoute) => void
   prefix?:     string
   beforeEach?: BeforeEach
 }
@@ -87,11 +87,12 @@ class Router {
       if (isEquals(target, from)) return;
 
       this.beforeEach(to, from, () => {
+        if (to.fullPath === from.fullPath) return;
         this.currentRoute = to;
         const query = queryRoute(routes, to.path.replace(prefix, ''));
 
         function finish() {
-          controls(query);
+          controls(query, to);
           resolve({ to, from });
         }
 

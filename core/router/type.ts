@@ -28,6 +28,7 @@ export type RouteItem = {
 }
 
 export type PageProps = {
-  path: string
-  data: any
+  path:  string
+  data:  any
+  error: any
 }

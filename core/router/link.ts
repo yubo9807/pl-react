@@ -34,7 +34,7 @@ export function Link(props: LinkProps) {
       toPath === routePath ? 'exact-active' : '',
       ...[className].flat(),
     ]);
-  }), []);
+  }), [className]);
 
   function onclick(e) {
     e.preventDefault();
