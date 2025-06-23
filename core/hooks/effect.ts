@@ -53,7 +53,11 @@ export class Effect extends BasicHook<EffectItem> {
       clear && clear();
 
       const reslut = func();
-      item.clear = isPromise(reslut) ? await reslut : reslut;
+      if (isPromise(reslut)) {
+        reslut.then(res => item.clear = res);
+      } else {
+        item.clear = reslut;
+      }
       item.oldDeps = deps;
     })
   }
