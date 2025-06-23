@@ -1,11 +1,11 @@
-import { isEquals, isFunction } from "../utils";
+import { isFunction } from "../utils";
 import { BasicHook, isEqual, useInstanceTips } from "./utils";
 
 type Update = (k: object) => void
 type Option = {
   update: Update
 }
-type SetValue<T> = (newValue: T | ((oldValue: T) => T)) => void
+type SetValue<T> = (newValue: T | ((oldValue: T) => T)) => T
 export class State extends BasicHook<any> {
 
   option: Option
@@ -38,6 +38,7 @@ export class State extends BasicHook<any> {
       if (isEqual(newValue, value)) return;
       map.set(count, newValue);
       option.update(instance);
+      return newValue;
     }
 
     dataMap.set(instance, map);
