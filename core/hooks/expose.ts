@@ -1,3 +1,4 @@
+import { isPromise } from "../utils";
 import { RefItem } from "./ref";
 import { BasicHook, isEquals, useInstanceTips } from "./utils";
 
@@ -24,7 +25,13 @@ export class Expose extends BasicHook<ExposeItem> {
     // 不存在 || 依赖项发生变化
     if (!item || !isEquals(item.deps, deps)) {
       const expose = handle();
-      ref.current = expose;
+      if (isPromise(expose)) {
+        expose.then((res) => {
+          ref.current = res;
+        })
+      } else {
+        ref.current = expose;
+      }
       map.set(count, { expose, deps });
       dataMap.set(instance, map);
     } else {

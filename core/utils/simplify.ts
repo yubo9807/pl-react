@@ -15,6 +15,7 @@ export function printError(msg: string) {
 * 在微任务中执行函数
 * @param func 
 */
-export function nextTick(func: Function) {
-  return Promise.resolve().then(func as any);
+export function nextTick<T extends () => void>(func?: T): Promise<ReturnType<T>> {
+  // @ts-ignore
+  return Promise.resolve().then(func);
 }
