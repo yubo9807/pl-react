@@ -1,6 +1,6 @@
 import { isPromise } from "../utils";
-import { RefItem } from "./ref";
 import { BasicHook, isEquals, useInstanceTips } from "./utils";
+import type { RefItem } from "./ref";
 
 type ExposeItem = {
   expose: any

@@ -1,6 +1,6 @@
-import { AnyObj } from "../utils";
 import { BasicHook, useInstanceTips } from "./utils";
 import type { createContext } from "../components";
+import type { AnyObj } from "../utils";
 import type { CompTree } from "../types";
 
 export class Context extends BasicHook<AnyObj> {

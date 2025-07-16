@@ -50,11 +50,11 @@ export function Link(props: LinkProps) {
     }
   }
 
-  const fullpath = config.mode === 'history' ? props.to : '#' + props.to;
+  const href = config.mode === 'history' ? config.base + props.to : '#' + props.to;
   return h('a', {
     ...args,
     className: classList,
-    href: config.base + fullpath,
+    href,
     onclick,
   }, ...children);
 }
