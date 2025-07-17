@@ -10,6 +10,7 @@ type Props = {
   children?:   CompTree[]
   loading?:    Component | TreeValue
   beforeEach?: BeforeEach
+  afterEach?:  (path: string | RegExp) => void
 }
 function useRoutes(props: Props) {
   return useMemo(() => props.children.map(item => {
@@ -65,10 +66,12 @@ export function BrowserRouter(props: Props) {
           tree.attrs.error = err;
         }).finally(() => {
           setChild(tree);
+          props.afterEach?.(tree.attrs.path);
         })
       }
     } else {
       setChild(tree);
+      props.afterEach?.(tree.attrs.path);
     }
   }
 
