@@ -25,3 +25,46 @@ function App() {
 const app = createApp();
 app.render(<App />, document.getElementById('root'));
 ```
+
+## 原生调用
+
+```tsx
+import { h, useImperativeHandle, useState } from "pl-react";
+import { RefItem } from "pl-react/hooks";
+import { PropsType } from "pl-react/types";
+
+type Expose = {
+  add: () => void
+}
+interface Props extends PropsType {
+  text: string
+  ref: RefItem<Expose>
+}
+export function MyComp(props: Props) {
+  const [count, setCount] = useState(0);
+
+  useImperativeHandle(props.ref, () => {
+    return {
+      add() {
+        setCount(count + 1)
+      }
+    }
+  })
+
+  return <div>
+    {props.text}: {count}
+  </div>
+}
+```
+
+```ts
+import { useComponent } from 'pl-react';
+import MyComp from './my-comp';
+
+const expose = useComponent(
+  MyComp,             // 组件名
+  { text: 'hello' },  // props
+  document.body,      // 挂载节点
+);
+expose.add();  // 执行组件暴露方法
+```
