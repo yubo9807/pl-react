@@ -44,6 +44,8 @@ export const useStore: Store['use'] = (result) => {
 // #endregion
 
 
+export type ComponentExpose<C extends (p: AnyObj) => any> = Parameters<C>[0]['ref']['current']
+type UseComponentResult<C extends (p: AnyObj) => any> = ComponentExpose<C> & { _nodes: HTMLElement[] }
 /**
  * 直接使用一个组件
  * @param Comp 
@@ -55,8 +57,8 @@ export function useComponent<C extends (p: AnyObj) => any>(
   Comp:    C,
   props:   ExcludeKey<Parameters<C>[0], 'ref'>,
   parent?: HTMLElement,
-) {
-  const ref = { current: {} as any };
+): UseComponentResult<C> {
+  const ref = { current: {} as UseComponentResult<C> };
   const nodes = createApp().render(h(Comp, { ref, ...props }) as CompTree, parent);
   ref.current._nodes = nodes;
   return ref.current;
