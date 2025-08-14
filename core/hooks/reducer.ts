@@ -5,15 +5,17 @@ export type ReducerAction = {
   type: string
   [k: string]: any
 }
+
+type ReducerResult<S> = S extends Promise<any> ? Promise<S> : S
 export type ReducerHandle<S, A extends ReducerAction> = (state: S, action: A) => (S | Promise<S>);
-type ReducerItem = {
+type ReducerItem<S> = {
   state: any
-  dispatch: (action: ReducerAction) => void
+  dispatch: (action: ReducerAction) => ReducerResult<S>
 }
 type Option = {
   update: (instance: Instance) => void
 }
-export class Reducer extends BasicHook<ReducerItem> {
+export class Reducer extends BasicHook<ReducerItem<any>> {
 
   option: Option
   constructor(option: Option) {
@@ -25,12 +27,12 @@ export class Reducer extends BasicHook<ReducerItem> {
     reducer: ReducerHandle<S, A>,
     state:   S, 
     init?:   (state: S) => S
-  ): [S, (action: A) => void] {
+  ): [S, (action: A) => ReducerResult<S>] {
 
     const { instance, dataMap, count, option } = this;
     useInstanceTips(instance);
 
-    const map = dataMap.get(instance) || new Map<number, ReducerItem>();
+    const map = dataMap.get(instance) || new Map<number, ReducerItem<S>>();
 
     if (map.has(count)) {
       const item = map.get(count);
@@ -57,6 +59,7 @@ export class Reducer extends BasicHook<ReducerItem> {
     dataMap.set(instance, map);
 
     this.count ++;
+    // @ts-ignore
     return [state, dispatch]
   }
 }

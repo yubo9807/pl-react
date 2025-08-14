@@ -40,7 +40,11 @@ type StoreItem = {}
 export class Store extends BasicHook<StoreItem> {
 
   use<S extends ReturnType<typeof defineStore>>(store: S)
-    : { state: S['state'], dispatch: (action: Parameters<S['handle']>[1]) => void }
+    : {
+        state: S['state'], 
+        dispatch: (action: Parameters<S['handle']>[1]) => 
+          S['handle'] extends Promise<any> ? Promise<S['state']> : S['state']
+      }
   {
     const { instance } = this;
     useInstanceTips(instance);
@@ -61,7 +65,7 @@ export class Store extends BasicHook<StoreItem> {
     return {
       state: data,
       dispatch,
-    }
+    } as any
   }
 
   remove(tree: CompTree) {
