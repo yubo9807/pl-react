@@ -86,22 +86,27 @@ class Router {
       const from = { ...this.currentRoute };
       if (isEquals(target, from)) return;
 
-      this.beforeEach(to, from, () => {
+      this.beforeEach(to, from, (target) => {
         if (to.fullPath === from.fullPath) return;
         this.currentRoute = to;
-        const query = queryRoute(routes, to.path.replace(prefix, ''));
+        let query = queryRoute(routes, to.path.replace(prefix, ''));
 
-        function finish() {
-          controls(query, to);
-          resolve({ to, from });
+        function finish(target?: PartialRoute | string) {
+          let newTo = to;
+          if (target) {
+            newTo = parseUrl(isString(target) ? target : stringifyUrl(target));
+            query = queryRoute(routes, newTo.path.replace(prefix, ''));
+          }
+          resolve({ to: newTo, from });
+          controls(query, newTo);
         }
 
         if (query && query.beforeEach) {
-          query.beforeEach(to, from, () => {
-            finish();
+          query.beforeEach(to, from, (target) => {
+            finish(target);
           })
         } else {
-          finish();
+          finish(target);
         }
       });
     })

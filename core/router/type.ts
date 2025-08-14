@@ -16,7 +16,7 @@ export interface PartialRoute extends Partial<BaseRoute> {
   meta?: Meta
 }
 
-export type BeforeEach = (to: BaseRoute, from: BaseRoute, next: Function) => void
+export type BeforeEach = (to: BaseRoute, from: BaseRoute, next: (target?: PartialRoute | string) => void) => void
 
 export type RouteItem = {
   path:        string | RegExp
