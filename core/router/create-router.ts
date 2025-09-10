@@ -97,6 +97,7 @@ class Router {
             newTo = parseUrl(isString(target) ? target : stringifyUrl(target));
             query = queryRoute(routes, newTo.path.replace(prefix, ''));
           }
+          currentRoute = newTo;
           resolve({ to: newTo, from });
           controls(query, newTo);
         }
@@ -158,9 +159,6 @@ async function jump(to: PartialRoute | string, type: 'push' | 'replace') {
     target = res;
   }
   if (isEquals(target.to, target.from)) return;
-
-  // 当前路由
-  currentRoute = target.to;
 
   // 执行注册的监听路由方法
   routerChangeSet.forEach(func => {

@@ -44,7 +44,8 @@ export const useStore: Store['use'] = (result) => {
 // #endregion
 
 
-export type ComponentExpose<C extends (p: AnyObj) => any> = Parameters<C>[0]['ref']['current']
+export type ComponentProps<C extends (p: AnyObj) => any> = Parameters<C>[0]
+export type ComponentExpose<C extends (p: AnyObj) => any> = ComponentProps<C>['ref']['current']
 type UseComponentResult<C extends (p: AnyObj) => any> = ComponentExpose<C> & { _nodes: HTMLElement[] }
 /**
  * 直接使用一个组件

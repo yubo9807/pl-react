@@ -239,7 +239,7 @@ export class JsxToNodes {
       if (newTree.tag !== oldTree.tag) {
         self.destroyComp(oldTree, false);
         const newNodes = self.render(newTree);
-        nodes_replaceWith(newNodes, nodes);
+        nodes_replaceWith(newNodes, self.fragmentMap.get(oldTree) || nodes);
         return newNodes;
       }
 

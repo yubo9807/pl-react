@@ -21,10 +21,12 @@ export class Callback extends BasicHook<CallBackItem> {
     const item = map.get(count);
 
     if (item && isEquals(deps, item.deps)) {
+      this.count ++;
       return item.func as T;
     }
 
     map.set(count, { func, deps });
+    dataMap.set(instance, map);
     this.count ++;
 
     return func;
