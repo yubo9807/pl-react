@@ -55,6 +55,14 @@ export function attrAssign(el: HTMLElement, key: string, value: any) {
     }
     return;
   }
+  if (key.startsWith('data-')) {
+    el.dataset[key.slice(5)] = value;
+    return;
+  }
+  if (key === 'created') {
+    value(el);
+    return;
+  }
 
   if (key === 'className' && isArray(value)) {
     value = joinClass(...value);

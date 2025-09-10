@@ -8,6 +8,7 @@ type HTMLAttributes<T extends AnyObj> = {
   className?: string | string[]
   style?:     string | StyleObject
   ref?:       RefItem<unknown>
+  created?:   (el: T) => void
 }
 
 export interface IntrinsicElements {
