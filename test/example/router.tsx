@@ -51,7 +51,7 @@ function App2() {
     <Router loading={() => <div>loading</div>}>
       <Route path='/home' element={() => import('../pages/home')} />
       <Route path='/utils' element={() => import('../pages/utils')} exact={false} />
-      <Route path='/tools' element={() => import('../pages/tools')} />
+      <Route path='/tools' element={() => import('../pages/tools')} exact={false} />
       <Route path={/./} element={() => <h1>404</h1>} />
     </Router>
   </div>

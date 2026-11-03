@@ -1,16 +1,16 @@
 {
   "compilerOptions": {
+    "moduleResolution": "node",
     "jsx": "react",
     "target": "ESNext",
     "module": "ESNext",
+    "strict": false,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "moduleResolution": "node",
     "jsxFactory": "h",
     "jsxFragmentFactory": "Fragment",
-    "baseUrl": "./",
     "paths": {
-      "@/*": ["test/*"],
+      "@/*": ["./test/*"],
       "~/*": ["./*"],
     },
   },
