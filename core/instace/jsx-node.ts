@@ -261,7 +261,7 @@ export class JsxToNodes {
           if (isEmpty(oldChildTree)) {
             // 新增节点
             newNodes = self.render(newChildTree);
-            const lastChildNode = newChildNodes[i - 1];
+            const lastChildNode = newChildNodes[i - 1] || childNodes[i - 1];
             nodes_after(newNodes, lastChildNode);
           } else {
             // 替换节点

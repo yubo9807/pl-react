@@ -33,6 +33,10 @@
     "./router": {
       "import": "./router/index.js",
       "require": "./router/index.cjs"
+    },
+    "./jsx": {
+      "import": "./jsx.d.ts",
+      "require": "./jsx.d.ts"
     }
   },
   "author": "yubo9807",
