@@ -3,7 +3,7 @@ export function replaceVersion() {
   return {
     name: 'replace-version',
 
-    transform(code, id) {
+    transform(code: string, id: string) {
       return code.replace('process.env.version', `'${process.env.npm_package_version}'`);
     },
   }
@@ -18,7 +18,7 @@ export function replaceModuleName() {
   return {
     name: 'replace-module-name',
 
-    renderChunk(code) {
+    renderChunk(code: string) {
       // 整条 require('...') / require("...") 原子重写：
       // 1. 用带回调的 String.replace(/regex/g, fn)，避免旧实现里
       //    code.replace(纯字符串, ...) 只替换首个出现位置 + 子串跨行污染

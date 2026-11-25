@@ -1,6 +1,6 @@
 {
   "name": "pl-react",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Pl React",
   "scripts": {
     "dev": "vite -c build/vite.client.ts",
